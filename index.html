@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكالمة P2P مباشرة - المنسف الرقمي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            color: #e94560;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 1em;
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e94560;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #00d9ff;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .status-text {
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h3 {
+            color: #e94560;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-box {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 10px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #e94560, #ff6b6b); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-success { background: linear-gradient(135deg, #00d9ff, #00ff88); color: #1a1a2e; }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .actions .btn { flex: 1; }
+
+        .call-controls {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .call-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-btn.start {
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.4);
+        }
+
+        .call-btn.end {
+            background: linear-gradient(135deg, #e94560, #ff4444);
+            color: white;
+            box-shadow: 0 0 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .audio-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 12px;
+            height: 25px;
+        }
+
+        .bar {
+            width: 3px;
+            background: #00ff88;
+            border-radius: 2px;
+            height: 4px;
+            transition: height 0.05s ease;
+        }
+
+        .error-msg {
+            background: rgba(255, 0, 0, 0.1);
+            border-right: 4px solid #ff4444;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #ff8888;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📞 المنسف الصوتي (P2P)</h1>
+            <p>مكالمة مباشرة من حديدتك لحديدته - بدون وسيط</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="status-text" id="statusText">غير متصل</span>
+        </div>
+
+        <div id="errorContainer"></div>
+
+        <div class="call-controls">
+            <button class="call-btn start" id="callBtn" onclick="toggleCall()">📞</button>
+            <div class="audio-indicator" id="audioIndicator"></div>
+        </div>
+
+        <div class="main-grid">
+            <div class="panel">
+                <h3>📤 كود العرض (Offer)</h3>
+                <textarea class="code-box" id="offerBox" placeholder="اضغط زر الاتصال لتوليد كود Offer..."></textarea>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="copyText('offerBox', 'تم نسخ Offer')">📋 نسخ</button>
+                    <button class="btn btn-primary" onclick="generateOffer()">🚀 توليد</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📥 كود الرد (Answer)</h3>
+                <textarea class="code-box" id="answerBox" placeholder="الصق كود Answer هنا..."></textarea>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="pasteText('answerBox')">📋 لصق</button>
+                    <button class="btn btn-success" onclick="connectWithAnswer()">🔗 اتصل</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>🌐 استقبال عرض من جهاز آخر</h3>
+            <textarea class="code-box" id="remoteOfferBox" placeholder="الصق كود Offer الوارد من الطرف الثاني هنا..."></textarea>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="pasteText('remoteOfferBox')">📋 لصق</button>
+                <button class="btn btn-success" onclick="answerRemoteOffer()">📞 رد على العرض</button>
+            </div>
+            <div id="remoteAnswerContainer" style="margin-top: 12px;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 0.85em;">
+            workartgroup.com - Direct Connection Core
+        </div>
+    </div>
+
+    <audio id="remoteAudio" autoplay></audio>
+
+    <script>
+        let pc = null;
+        let localStream = null;
+        let isConnected = false;
+        let isInitiator = false;
+
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const callBtn = document.getElementById('callBtn');
+        const offerBox = document.getElementById('offerBox');
+        const answerBox = document.getElementById('answerBox');
+        const remoteAudio = document.getElementById('remoteAudio');
+
+        // الحفاظ على الحالة عند مغادرة الصفحة والعودة إليها
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('p2p_state', JSON.stringify({
+                offer: offerBox.value,
+                answer: answerBox.value,
+                remoteOffer: document.getElementById('remoteOfferBox').value
+            }));
+        });
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('p2p_state');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (state.offer) offerBox.value = state.offer;
+                    if (state.answer) answerBox.value = state.answer;
+                    if (state.remoteOffer) document.getElementById('remoteOfferBox').value = state.remoteOffer;
+                } catch(e) {}
+            }
+        });
+
+        function updateStatus(text, connected = false) {
+            statusText.textContent = text;
+            if (connected) {
+                statusDot.classList.add('connected');
+            } else {
+                statusDot.classList.remove('connected');
+            }
+        }
+
+        function showError(msg) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        async function initPC() {
+            pc = new RTCPeerConnection({
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            });
+
+            pc.ontrack = (e) => {
+                remoteAudio.srcObject = e.streams[0];
+                updateStatus('✅ متصل! المكالمة شغالة 100%', true);
+                callBtn.textContent = '🔴';
+                callBtn.classList.remove('start');
+                callBtn.classList.add('end');
+                isConnected = true;
+            };
+
+            pc.onicecandidate = (e) => {
+                if (!e.candidate) {
+                    if (isInitiator) {
+                        offerBox.value = JSON.stringify(pc.localDescription);
+                    } else {
+                        const answerText = JSON.stringify(pc.localDescription);
+                        document.getElementById('remoteAnswerContainer').innerHTML = `
+                            <textarea class="code-box" id="generatedAnswer" readonly>${answerText}</textarea>
+                            <button class="btn btn-secondary" onclick="copyText('generatedAnswer', 'تم نسخ كود الرد')" style="margin-top:8px;">📋 نسخ كود الرد</button>
+                        `;
+                    }
+                }
+            };
+
+            pc.onconnectionstatechange = () => {
+                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    updateStatus('❌ انقطع الاتصال');
+                    resetCall();
+                }
+            };
+        }
+
+        async function getAudio() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                visualizeAudio();
+                return true;
+            } catch (err) {
+                showError('صلاحية الميكروفون مطلوبة: ' + err.message);
+                return false;
+            }
+        }
+
+        async function generateOffer() {
+            if (!await getAudio()) return;
+            isInitiator = true;
+            await initPC();
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            updateStatus('🟡 جاهز Offer - انسخه وأرسله للطرف الثاني');
+        }
+
+        async function connectWithAnswer() {
+            const val = answerBox.value.trim();
+            if (!val) { showError('الرجاء لصق كود Answer أولاً'); return; }
+            try {
+                await pc.setRemoteDescription(JSON.parse(val));
+                updateStatus('🟡 جاري مطابقة الاتصال...');
+            } catch (err) {
+                showError('خطأ في صيغة الـ Answer: ' + err.message);
+            }
+        }
+
+        async function answerRemoteOffer() {
+            const val = document.getElementById('remoteOfferBox').value.trim();
+            if (!val) { showError('الرجاء لصق كود Offer أولاً'); return; }
+            if (!await getAudio()) return;
+            isInitiator = false;
+            await initPC();
+            try {
+                await pc.setRemoteDescription(JSON.parse(val));
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                updateStatus('🟡 جاهز Answer - انسخه وأرسله للطرف الأول');
+            } catch (err) {
+                showError('خطأ في صيغة الـ Offer الوارد: ' + err.message);
+            }
+        }
+
+        function copyText(elementId, msg) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.value) { showError('لا يوجد محتوى للنسخ'); return; }
+            el.select();
+            document.execCommand('copy');
+            updateStatus(`✅ ${msg}`);
+        }
+
+        async function pasteText(elementId) {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById(elementId).value = text;
+                updateStatus('✅ تم اللصق بنجاح');
+            } catch {
+                document.getElementById(elementId).focus();
+                showError('استخدم Ctrl+V للصق مباشرة');
+            }
+        }
+
+        function toggleCall() {
+            if (isConnected) {
+                resetCall();
+            } else {
+                generateOffer();
+            }
+        }
+
+        function resetCall() {
+            if (pc) { pc.close(); pc = null; }
+            if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+            offerBox.value = '';
+            answerBox.value = '';
+            document.getElementById('remoteOfferBox').value = '';
+            document.getElementById('remoteAnswerContainer').innerHTML = '';
+            callBtn.textContent = '📞';
+            callBtn.classList.remove('end');
+            callBtn.classList.add('start');
+            isConnected = false;
+            isInitiator = false;
+            localStorage.removeItem('p2p_state');
+            updateStatus('غير متصل');
+        }
+
+        // مؤشر ترددات الصوت الحية (نبضات المنسف)
+        function visualizeAudio() {
+            if (!localStream) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const src = audioCtx.createMediaStreamSource(localStream);
+                const analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 32;
+                src.connect(analyser);
+                const data = new Uint8Array(analyser.frequencyBinCount);
+                const indicator = document.getElementById('audioIndicator');
+
+                function draw() {
+                    analyser.getByteFrequencyData(data);
+                    indicator.innerHTML = '';
+                    for (let i = 0; i < 8; i++) {
+                        const bar = document.createElement('div');
+                        bar.className = 'bar';
+                        const h = (data[i] / 255) * 22;
+                        bar.style.height = Math.max(4, h) + 'px';
+                        indicator.appendChild(bar);
+                    }
+                    if (localStream) requestAnimationFrame(draw);
+                }
+                draw();
+            } catch(e) {}
+        }
+    </script>
+</body>
+</html>
