@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكالمة P2P مباشرة - المنسف الرقمي</title>
+    <title>مكالمة P2P مباشرة - المنسف الرقمي الأصيل</title>
     <style>
         * {
             margin: 0;
@@ -277,7 +277,7 @@
         const answerBox = document.getElementById('answerBox');
         const remoteAudio = document.getElementById('remoteAudio');
 
-        // الحفاظ على الحالة بالخلفية لضمان استمرارية العمل وعدم ضياع الأكواد
+        // الحفاظ على الحالة بالخلفية لضمان استمرارية العمل وعدم ضياع الأكواد عند الانتقال بين التطبيقات
         window.addEventListener('beforeunload', () => {
             localStorage.setItem('p2p_state', JSON.stringify({
                 offer: offerBox.value,
