@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مكالمة صوتية P2P أوفلاين</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #00d4aa;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+    .status {
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .status.idle { background: #2d2d44; color: #aaa; }
+    .status.ready { background: #1a3a1a; color: #4ade80; }
+    .status.calling { background: #3a2a1a; color: #fbbf24; }
+    .status.connected { background: #1a3a2a; color: #4ade80; }
+    .status.error { background: #3a1a1a; color: #f87171; }
+
+    .section {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #0f3460;
+    }
+    .section h2 {
+      color: #e94560;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin: 5px;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: #e94560; color: white; }
+    .btn-primary:hover { background: #ff6b6b; }
+    .btn-success { background: #00d4aa; color: #1a1a2e; }
+    .btn-success:hover { background: #00f5c4; }
+    .btn-danger { background: #f87171; color: white; }
+    .btn-danger:hover { background: #ef4444; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #0f3460;
+      background: #0a0a1a;
+      color: #4ade80;
+      font-family: monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+      margin: 10px 0;
+    }
+    textarea::placeholder { color: #555; }
+
+    .audio-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      margin-top: 15px;
+    }
+    .audio-bar {
+      width: 6px;
+      background: #00d4aa;
+      border-radius: 3px;
+      animation: pulse 1s ease-in-out infinite;
+    }
+    .audio-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+    .audio-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+    .audio-bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+    .audio-bar:nth-child(4) { height: 35px; animation-delay: 0.3s; }
+    .audio-bar:nth-child(5) { height: 20px; animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .hidden { display: none; }
+
+    .steps {
+      background: #0a0a1a;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+    .steps ol { padding-right: 20px; }
+    .steps li { margin-bottom: 8px; color: #ccc; line-height: 1.6; }
+    .steps li strong { color: #e94560; }
+
+    .copy-hint {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 5px;
+    }
+
+    .local-audio { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📞 مكالمة صوتية P2P أوفلاين</h1>
+    <p class="subtitle">مكالمة مباشرة بين جهازين على نفس الشبكة - بدون إنترنت ولا خادم</p>
+
+    <div id="status" class="status idle">🔴 غير متصل - اضغط "ابدأ المكالمة"</div>
+
+    <!-- الخطوة 1: البدء -->
+    <div class="section" id="step1">
+      <h2>الخطوة 1: امنح إذن الميكروفون</h2>
+      <button class="btn btn-primary" id="btnStart" onclick="startCall()">🎤 ابدأ المكالمة</button>
+      <div class="steps">
+        <ol>
+          <li>اضغط الزر فوق لمنح إذن الميكروفون</li>
+          <li>انتظر ظهور كود العرض (Offer)</li>
+          <li>انسخ الكود وأرسله للجهاز الثاني</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- الخطوة 2: عرض Offer -->
+    <div class="section hidden" id="step2">
+      <h2>الخطوة 2: انسخ كود العرض (Offer)</h2>
+      <p class="copy-hint">انسخ هذا الكود كاملاً وأرسله للجهاز الثاني عبر WhatsApp أو أي طريقة:</p>
+      <textarea id="offerSdp" readonly></textarea>
+      <button class="btn btn-success" onclick="copyToClipboard('offerSdp')">📋 نسخ الكود</button>
+    </div>
+
+    <!-- الخطوة 3: استقبال Answer -->
+    <div class="section hidden" id="step3">
+      <h2>الخطوة 3: الصق رد الجهاز الثاني (Answer)</h2>
+      <p class="copy-hint">اطلب من الجهاز الثاني إرسال كود الرد (Answer) والصقه هنا:</p>
+      <textarea id="answerSdp" placeholder="الصق كود Answer هنا..."></textarea>
+      <button class="btn btn-success" id="btnConnect" onclick="connect()">🔗 اتصل</button>
+    </div>
+
+    <!-- أو: استقبال Offer -->
+    <div class="section" id="stepAlt">
+      <h2>🔄 أو: أنت الجهاز الثاني؟</h2>
+      <p class="copy-hint">إذا استلمت كود Offer من جهاز آخر، الصقه هنا:</p>
+      <textarea id="receivedOffer" placeholder="الصق كود Offer المستلم هنا..."></textarea>
+      <button class="btn btn-primary" onclick="receiveOffer()">📥 استقبل العرض</button>
+    </div>
+
+    <!-- الخطوة 4: عرض Answer -->
+    <div class="section hidden" id="step4">
+      <h2>الخطوة 4: أرسل هذا الرد (Answer)</h2>
+      <p class="copy-hint">انسخ هذا الكود وأرسله للجهاز الأول:</p>
+      <textarea id="answerOutput" readonly></textarea>
+      <button class="btn btn-success" onclick="copyToClipboard('answerOutput')">📋 نسخ الكود</button>
+    </div>
+
+    <!-- حالة الاتصال -->
+    <div class="section hidden" id="callActive">
+      <h2>✅ المكالمة نشطة</h2>
+      <div class="audio-indicator">
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+      </div>
+      <p style="text-align:center; margin-top:10px; color:#00d4aa;">🔊 تستمع الآن للجهاز الآخر</p>
+      <div style="text-align:center; margin-top:15px;">
+        <button class="btn btn-danger" onclick="endCall()">❌ إنهاء المكالمة</button>
+      </div>
+    </div>
+
+    <audio id="remoteAudio" autoplay></audio>
+    <audio id="localAudio" class="local-audio" autoplay muted></audio>
+  </div>
+
+  <script>
+    let pc = null;
+    let localStream = null;
+    let isCaller = false;
+
+    const statusEl = document.getElementById('status');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const step4 = document.getElementById('step4');
+    const stepAlt = document.getElementById('stepAlt');
+    const callActive = document.getElementById('callActive');
+
+    function setStatus(text, type) {
+      statusEl.textContent = text;
+      statusEl.className = 'status ' + type;
+    }
+
+    function show(el) { el.classList.remove('hidden'); }
+    function hide(el) { el.classList.add('hidden'); }
+
+    async function startCall() {
+      try {
+        setStatus('🟡 جاري طلب إذن الميكروفون...', 'calling');
+
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        document.getElementById('localAudio').srcObject = localStream;
+
+        pc = new RTCPeerConnection({
+          iceServers: [] // بدون STUN/TURN - أوفلاين 100%
+        });
+
+        localStream.getTracks().forEach(track => {
+          pc.addTrack(track, localStream);
+        });
+
+        pc.ontrack = event => {
+          document.getElementById('remoteAudio').srcObject = event.streams[0];
+          setStatus('✅ متصل! المكالمة نشطة', 'connected');
+          show(callActive);
+          hide(step3);
+        };
+
+        pc.onconnectionstatechange = () => {
+          if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+            setStatus('🔴 انقطع الاتصال', 'error');
+          }
+        };
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        // انتظر ICE gathering
+        await new Promise(resolve => {
+          if (pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            pc.onicegatheringstatechange = () => {
+              if (pc.iceGatheringState === 'complete') resolve();
+            };
+            // timeout fallback
+            setTimeout(resolve, 3000);
+          }
+        });
+
+        document.getElementById('offerSdp').value = JSON.stringify(pc.localDescription);
+        isCaller = true;
+
+        setStatus('🟢 جاهز! انسخ كود Offer وأرسله', 'ready');
+        hide(step1);
+        hide(stepAlt);
+        show(step2);
+
+      } catch (err) {
+        setStatus('❌ خطأ: ' + err.message, 'error');
+        console.error(err);
+      }
+    }
+
+    async function receiveOffer() {
+      try {
+        const offerText = document.getElementById('receivedOffer').value.trim();
+        if (!offerText) {
+          alert('الصق كود Offer أولاً!');
+          return;
+        }
+
+        setStatus('🟡 جاري الاتصال...', 'calling');
+
+        const offer = JSON.parse(offerText);
+
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        document.getElementById('localAudio').srcObject = localStream;
+
+        pc = new RTCPeerConnection({
+          iceServers: []
+        });
+
+        localStream.getTracks().forEach(track => {
+          pc.addTrack(track, localStream);
+        });
+
+        pc.ontrack = event => {
+          document.getElementById('remoteAudio').srcObject = event.streams[0];
+          setStatus('✅ متصل! المكالمة نشطة', 'connected');
+          show(callActive);
+        };
+
+        await pc.setRemoteDescription(offer);
+
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+
+        await new Promise(resolve => {
+          if (pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            pc.onicegatheringstatechange = () => {
+              if (pc.iceGatheringState === 'complete') resolve();
+            };
+            setTimeout(resolve, 3000);
+          }
+        });
+
+        document.getElementById('answerOutput').value = JSON.stringify(pc.localDescription);
+
+        setStatus('🟢 انسخ كود Answer وأرسله للجهاز الأول', 'ready');
+        hide(stepAlt);
+        hide(step1);
+        show(step4);
+
+      } catch (err) {
+        setStatus('❌ خطأ: ' + err.message, 'error');
+        console.error(err);
+      }
+    }
+
+    async function connect() {
+      try {
+        const answerText = document.getElementById('answerSdp').value.trim();
+        if (!answerText) {
+          alert('الصق كود Answer أولاً!');
+          return;
+        }
+
+        setStatus('🟡 جاري إكمال الاتصال...', 'calling');
+
+        const answer = JSON.parse(answerText);
+        await pc.setRemoteDescription(answer);
+
+      } catch (err) {
+        setStatus('❌ خطأ: ' + err.message, 'error');
+        console.error(err);
+      }
+    }
+
+    function endCall() {
+      if (pc) {
+        pc.close();
+        pc = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+
+      setStatus('🔴 المكالمة منتهية - اضغط "ابدأ المكالمة"', 'idle');
+
+      hide(step2);
+      hide(step3);
+      hide(step4);
+      hide(callActive);
+      show(step1);
+      show(stepAlt);
+
+      document.getElementById('offerSdp').value = '';
+      document.getElementById('answerSdp').value = '';
+      document.getElementById('receivedOffer').value = '';
+      document.getElementById('answerOutput').value = '';
+    }
+
+    function copyToClipboard(elementId) {
+      const el = document.getElementById(elementId);
+      el.select();
+      document.execCommand('copy');
+      alert('✅ تم النسخ!');
+    }
+  </script>
+</body>
+</html>
