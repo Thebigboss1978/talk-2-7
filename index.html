@@ -277,7 +277,7 @@
         const answerBox = document.getElementById('answerBox');
         const remoteAudio = document.getElementById('remoteAudio');
 
-        // الحفاظ على الحالة عند مغادرة الصفحة والعودة إليها
+        // الحفاظ على الحالة بالخلفية لضمان عدم ضياع الأكواد عند مغادرة الصفحة مؤقتاً
         window.addEventListener('beforeunload', () => {
             localStorage.setItem('p2p_state', JSON.stringify({
                 offer: offerBox.value,
