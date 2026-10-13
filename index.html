@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مكالمة P2P مباشرة بين طرفين — مصادقة حقيقية</title>
+    <title>مكالمة P2P مباشرة</title>
     <style>
         * {
             margin: 0;
@@ -17,27 +17,32 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: #fff;
-            padding: 20px;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 520px;
             margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .header h1 {
-            font-size: 2em;
-            margin-bottom: 6px;
+            font-size: 2.2em;
+            margin-bottom: 8px;
             color: #e94560;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .header p {
@@ -45,169 +50,84 @@
             font-size: 1.05em;
         }
 
-        /* Two Parties Role Selector */
-        .party-switch-bay {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        .status-bar {
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 14px;
-            padding: 6px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .party-tab-btn {
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
-            padding: 12px 14px;
-            border-radius: 10px;
-            font-size: 1em;
-            font-weight: 700;
-            cursor: pointer;
+            padding: 14px 20px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.25s ease;
-        }
-
-        .party-tab-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .party-tab-btn.active {
-            background: linear-gradient(135deg, #e94560, #ff6b6b);
-            color: #ffffff;
-            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
-        }
-
-        /* Real Handshake & Authentication Status Bar */
-        .handshake-panel {
-            background: rgba(0, 0, 0, 0.35);
-            border-radius: 14px;
-            padding: 14px 18px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
 
-        .handshake-row {
+        .status-left {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 0.95em;
+            gap: 12px;
         }
 
-        .party-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
+        .status-dot {
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: #ef4444;
-            display: inline-block;
+            background: #e94560;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.6);
         }
 
-        .dot.online {
+        .status-dot.connected {
             background: #00ff88;
-            box-shadow: 0 0 10px #00ff88;
+            box-shadow: 0 0 14px rgba(0, 255, 136, 0.9);
+            animation: none;
         }
 
-        .handshake-summary {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 0.88em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .status-dot.calling {
+            background: #ffb703;
+            box-shadow: 0 0 14px rgba(255, 183, 3, 0.9);
+            animation: pulse 1s infinite;
         }
 
-        .handshake-summary.ready {
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.3);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.9); }
         }
 
-        .handshake-summary.waiting {
-            color: #facc15;
-            border: 1px solid rgba(250, 204, 21, 0.3);
-        }
-
-        /* Quick Test Helper for opening other side in new tab */
-        .test-helper-bar {
-            background: rgba(6, 182, 212, 0.12);
-            border: 1px dashed rgba(6, 182, 212, 0.4);
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.88em;
-        }
-
-        .btn-open-other {
-            background: linear-gradient(135deg, #0284c7, #06b6d4);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
+        .status-text {
+            font-size: 1.05em;
             font-weight: 700;
+        }
+
+        .status-badge {
             font-size: 0.88em;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            color: #94a3b8;
         }
 
-        .btn-open-other:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
-        }
-
-        /* Main Call Control Bay */
+        /* Central Call Controls */
         .call-controls {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 32px 20px;
+            border-radius: 24px;
+            padding: 40px 20px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
         }
 
         .call-btn {
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             border: none;
-            font-size: 3.5em;
+            font-size: 3.8em;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            outline: none;
             user-select: none;
-        }
-
-        .call-btn.disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: #64748b;
-            cursor: not-allowed;
-            box-shadow: none !important;
-            transform: none !important;
         }
 
         .call-btn.start {
@@ -218,472 +138,352 @@
 
         .call-btn.start:hover {
             transform: scale(1.08);
-            box-shadow: 0 0 50px rgba(0, 217, 255, 0.7);
+            box-shadow: 0 0 55px rgba(0, 217, 255, 0.8);
         }
 
         .call-btn.calling {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: white;
-            box-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
-            animation: ringPulse 1s infinite;
+            background: linear-gradient(135deg, #ffb703, #fb8500);
+            color: #1a1a2e;
+            box-shadow: 0 0 35px rgba(255, 183, 3, 0.6);
+            animation: ring 1.2s infinite;
         }
 
         .call-btn.end {
             background: linear-gradient(135deg, #e94560, #ff4444);
             color: white;
             box-shadow: 0 0 35px rgba(233, 69, 96, 0.6);
+            animation: ring 1.5s infinite;
         }
 
-        @keyframes ringPulse {
+        @keyframes ring {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.06); }
         }
 
-        .call-btn-label {
-            font-size: 1.15em;
-            font-weight: 700;
+        .call-caption {
+            margin-top: 20px;
+            font-size: 1.25em;
+            font-weight: 800;
             color: #f1f5f9;
         }
 
-        .call-btn-sub {
-            font-size: 0.88em;
+        .call-subtext {
+            margin-top: 6px;
+            font-size: 0.92em;
             color: #94a3b8;
-            max-width: 380px;
-            line-height: 1.5;
         }
 
-        /* Audio Indicator Waves */
+        .call-timer {
+            margin-top: 14px;
+            font-size: 1.5em;
+            font-weight: 800;
+            color: #00ff88;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+        }
+
         .audio-indicator {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            height: 32px;
-            margin-top: 4px;
+            gap: 6px;
+            margin-top: 22px;
+            height: 36px;
         }
 
         .bar {
             width: 5px;
-            height: 6px;
             background: #00ff88;
             border-radius: 3px;
             transition: height 0.08s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
         }
 
-        .call-duration {
-            font-family: monospace;
-            font-size: 1.25em;
-            font-weight: 700;
-            color: #00ff88;
-            margin-top: 4px;
-        }
-
-        /* Incoming Call Big Banner (يظهر للطرف الآخر عند الاتصال) */
-        .incoming-call-box {
-            display: none;
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.18), rgba(0, 255, 136, 0.18));
-            border: 2px solid #00ff88;
-            border-radius: 18px;
-            padding: 24px;
+        /* Incoming Call Box (Ringing Alert) */
+        .incoming-card {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.25), rgba(0, 217, 255, 0.2));
+            border: 2px solid #00d9ff;
+            border-radius: 20px;
+            padding: 28px 20px;
             text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.35);
-            animation: bounceIn 0.3s ease-out;
+            margin-bottom: 24px;
+            animation: alertPulse 1.5s infinite;
+            box-shadow: 0 8px 35px rgba(0, 217, 255, 0.35);
         }
 
-        .incoming-call-box.active {
-            display: block;
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.3); }
+            50% { box-shadow: 0 0 45px rgba(0, 217, 255, 0.7); }
         }
 
-        @keyframes bounceIn {
-            from { transform: scale(0.92); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .incoming-bell {
+            font-size: 3.2em;
+            margin-bottom: 12px;
+            display: inline-block;
+            animation: ring 0.6s infinite;
         }
 
         .incoming-title {
-            font-size: 1.35em;
+            font-size: 1.4em;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 6px;
-        }
-
-        .incoming-sub {
-            font-size: 0.95em;
-            color: #cbd5e1;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .incoming-actions {
             display: flex;
             gap: 16px;
-            justify-content: center;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
-        .btn-answer {
-            flex: 1;
-            max-width: 180px;
+        .btn {
+            width: 100%;
             padding: 16px 20px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 1.15em;
-            font-weight: 800;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-success {
             background: linear-gradient(135deg, #00d9ff, #00ff88);
             color: #1a1a2e;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(0, 217, 255, 0.6);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.4);
         }
 
-        .btn-answer:hover {
-            transform: scale(1.05);
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 217, 255, 0.6);
         }
 
-        .btn-reject {
-            flex: 1;
-            max-width: 140px;
-            padding: 16px 20px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.15em;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff4444, #ff6666);
+        .btn-danger {
+            background: linear-gradient(135deg, #e94560, #ff4444);
             color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
         }
 
-        .btn-reject:hover {
-            transform: scale(1.05);
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(233, 69, 96, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .share-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+
+        .share-box input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #00d9ff;
+            font-family: monospace;
+            font-size: 0.85em;
+            outline: none;
+            direction: ltr;
+        }
+
+        .error-msg {
+            background: rgba(255, 68, 68, 0.15);
+            border-right: 4px solid #ff4444;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: #ff8888;
+            font-size: 0.95em;
         }
 
         .hidden {
             display: none !important;
         }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.88em;
+        }
+
+        @media (max-width: 500px) {
+            body { padding: 16px 12px; }
+            .call-btn { width: 125px; height: 125px; font-size: 3.2em; }
+            .header h1 { font-size: 1.85em; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📞 مكالمة P2P مباشرة</h1>
-            <p>مكالمة صوتية بين طرفين — مصادقة حقيقية 100% وبدون نسخ ولصق</p>
+            <p>اتصال واستقبال صوتي فوري ومباشر</p>
         </div>
 
-        <!-- 1. Party Selector -->
-        <div class="party-switch-bay">
-            <button class="party-tab-btn active" id="btnRole1" onclick="switchRole('party1')">
-                <span>📱</span>
-                <span id="roleLabel1">الطرف الأول (الوالد)</span>
-            </button>
-            <button class="party-tab-btn" id="btnRole2" onclick="switchRole('party2')">
-                <span>📱</span>
-                <span id="roleLabel2">الطرف الثاني (الابن)</span>
-            </button>
-        </div>
-
-        <!-- 2. Real Presence & Handshake Status (المصادقة الحقيقية الصادقة) -->
-        <div class="handshake-panel">
-            <div class="handshake-row">
-                <div class="party-indicator">
-                    <span class="dot" id="dotParty1"></span>
-                    <span>الطرف الأول (الوالد):</span>
-                    <span id="textParty1" style="color:#ef4444;">غير متصل</span>
-                </div>
-                <div class="party-indicator">
-                    <span class="dot" id="dotParty2"></span>
-                    <span>الطرف الثاني (الابن):</span>
-                    <span id="textParty2" style="color:#ef4444;">غير متصل</span>
-                </div>
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-dot" id="statusDot"></div>
+                <span class="status-text" id="statusText">جاهز للاتصال</span>
             </div>
-            <div class="handshake-summary waiting" id="handshakeSummary">
-                <span>⚠️ المصادقة:</span>
-                <span id="handshakeSummaryText">بانتظار فتح الطرف الثاني للصفحة على هاتفه أو في نافذة أخرى...</span>
+            <div class="status-badge" id="otherStatusBadge">
+                جاري الفحص...
             </div>
         </div>
 
-        <!-- 3. Helper to open other party for immediate live testing -->
-        <div class="test-helper-bar" id="testHelperBar">
-            <span>💡 تريد تجربة الاتصال والصوت فوراً على جهازك؟</span>
-            <button class="btn-open-other" onclick="openOtherPartyInNewWindow()">
-                فتح الطرف الآخر في نافذة جديدة ↗
-            </button>
-        </div>
+        <div id="errorArea"></div>
 
-        <!-- 4. Incoming Call Dialog (يظهر للطرف الثاني عند رنين المكالمة) -->
-        <div class="incoming-call-box" id="incomingCallBox">
-            <div class="incoming-title" id="incomingTitleText">🔔 مكالمة واردة من الطرف الآخر...</div>
-            <div class="incoming-sub">طلب اتصال WebRTC حقيقي وارد — اضغط إجابة للتحدث فوراً</div>
+        <!-- Incoming Call Box (Rings on Callee Device) -->
+        <div class="incoming-card hidden" id="incomingCard">
+            <div class="incoming-bell">🔔</div>
+            <div class="incoming-title">اتصال وارد...</div>
             <div class="incoming-actions">
-                <button class="btn-answer" onclick="answerCall()">🟢 إجابة</button>
-                <button class="btn-reject" onclick="rejectCall()">🔴 رفض</button>
+                <button class="btn btn-success" onclick="answerCall()">📞 إجابة</button>
+                <button class="btn btn-danger" onclick="rejectCall()">🔴 رفض</button>
             </div>
         </div>
 
-        <!-- 5. Big Call Control Button -->
+        <!-- Central Call Controls -->
         <div class="call-controls">
-            <button class="call-btn disabled" id="callBtn" onclick="handleCallButtonClick()" disabled>📞</button>
-            <div class="call-btn-label" id="callBtnLabel">بانتظار الطرف الثاني</div>
-            <div class="call-btn-sub" id="callBtnSub">يجب أن يفتح الطرف الآخر الصفحة أولاً لتكتمل المصادقة ويبدأ الاتصال الحقيقي.</div>
-
-            <div class="call-duration hidden" id="callDuration">00:00</div>
-            <div class="audio-indicator" id="audioIndicator">
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-                <div class="bar"></div>
-            </div>
+            <button class="call-btn start" id="callBtn" onclick="toggleCall()">📞</button>
+            <div class="call-caption" id="callCaption">اضغط للاتصال</div>
+            <div class="call-subtext" id="callSubtext">يرن هاتف الجهاز الآخر فوراً بنقرة واحدة</div>
+            <div id="callTimer" class="call-timer hidden">00:00</div>
+            <div class="audio-indicator" id="audioIndicator"></div>
         </div>
 
-        <div style="text-align: center; color: #64748b; font-size: 0.85em;">
-            اتصال WebRTC نقي ومباشر · صفر محاكاة · صفر نسخ ولصق
+        <!-- Direct Share Link to Open on Second Device -->
+        <div class="share-box">
+            <span>🔗 رابط الصفحة:</span>
+            <input type="text" id="shareInput" readonly value="">
+            <button class="btn-secondary" onclick="copyShareLink()">📋 نسخ</button>
+            <button class="btn-secondary" onclick="openShareLink()">↗ فتح</button>
+        </div>
+
+        <div class="footer">
+            workartgroup.com - P2P Voice Call
         </div>
     </div>
 
-    <!-- Hidden audio element for remote stream -->
+    <!-- Hidden audio element for live remote voice playback -->
     <audio id="remoteAudio" autoplay playsinline></audio>
 
     <script>
         /* ======================================================================
-           ZERO-MOCK REAL P2P TELEPHONY WITH HONEST HANDSHAKE
-           Party 1: party1 (الوالد)
-           Party 2: party2 (الابن)
+           PURE UNIVERSAL CALL & RECEIVE ENGINE
+           - Zero role selection (No "Party 1" or "Party 2")
+           - Press 📞 to Call -> Other device rings with 📞 Answer / 🔴 Reject
+           - Complete SDP ICE bundling for guaranteed real audio connection
            ====================================================================== */
 
-        // Read query params if opened directly as role (e.g. ?role=party2)
-        const urlParams = new URLSearchParams(window.location.search);
-        let myRole = urlParams.get('role') || localStorage.getItem('p2p_party_role') || 'party1';
+        // Generate or retain unique persistent device ID
+        const myDeviceId = sessionStorage.getItem('p2p_my_device_id') || ('dev_' + Math.floor(Math.random() * 899999 + 100000));
+        sessionStorage.setItem('p2p_my_device_id', myDeviceId);
 
-        let callState = 'idle'; // 'idle', 'calling', 'ringing', 'connected'
+        // WebRTC & Audio State
         let pc = null;
         let localStream = null;
-        let remoteAudio = document.getElementById('remoteAudio');
+        let callActive = false;
+        let callMode = 'idle'; // 'idle', 'calling', 'ringing', 'connected'
+        let pendingIncomingOffer = null;
+        let isResetting = false;
+        let callDurationSeconds = 0;
         let callTimerInterval = null;
-        let callSeconds = 0;
 
-        let otherPartyOnline = false;
-
-        // Web Audio Synthesizer for Ringtones
-        let audioCtx = null;
-        let ringInterval = null;
-        let analyser = null;
-        let animFrame = null;
-
-        // DOM elements
-        const btnRole1 = document.getElementById('btnRole1');
-        const btnRole2 = document.getElementById('btnRole2');
-        const dotParty1 = document.getElementById('dotParty1');
-        const dotParty2 = document.getElementById('dotParty2');
-        const textParty1 = document.getElementById('textParty1');
-        const textParty2 = document.getElementById('textParty2');
-        const handshakeSummary = document.getElementById('handshakeSummary');
-        const handshakeSummaryText = document.getElementById('handshakeSummaryText');
+        // UI References
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const otherStatusBadge = document.getElementById('otherStatusBadge');
         const callBtn = document.getElementById('callBtn');
-        const callBtnLabel = document.getElementById('callBtnLabel');
-        const callBtnSub = document.getElementById('callBtnSub');
-        const callDuration = document.getElementById('callDuration');
-        const incomingCallBox = document.getElementById('incomingCallBox');
-        const incomingTitleText = document.getElementById('incomingTitleText');
+        const callCaption = document.getElementById('callCaption');
+        const callSubtext = document.getElementById('callSubtext');
+        const callTimer = document.getElementById('callTimer');
+        const incomingCard = document.getElementById('incomingCard');
+        const remoteAudio = document.getElementById('remoteAudio');
+        const shareInput = document.getElementById('shareInput');
+        const errorArea = document.getElementById('errorArea');
 
-        // Cross-tab broadcast channel for local testing
+        // Share Link
+        shareInput.value = window.location.href;
+
+        function copyShareLink() {
+            shareInput.select();
+            document.execCommand('copy');
+            showError('✅ تم نسخ الرابط! افتحه على جهازك الآخر للاتصال به.');
+        }
+
+        function openShareLink() {
+            window.open(window.location.href, '_blank');
+        }
+
+        // Web Audio Ringtones & Visualizer
+        let audioCtx = null;
+        let ringTimer = null;
+        let visualizerAnim = null;
+
+        // Local Cross-tab broadcast for instant multi-tab testing
         let broadcast = null;
         try {
             if (window.BroadcastChannel) {
-                broadcast = new BroadcastChannel('p2p_true_handshake_bus');
-                broadcast.onmessage = (e) => onSignalReceived(e.data);
+                broadcast = new BroadcastChannel('universal_p2p_calling_bus');
+                broadcast.onmessage = (e) => onBroadcastMessage(e.data);
             }
         } catch (_) {}
 
-        // WebRTC Configuration with public STUN servers
+        // Google STUN servers
         const rtcConfig = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
             ]
         };
 
-        function getMyId() { return myRole; }
-        function getOtherId() { return myRole === 'party1' ? 'party2' : 'party1'; }
-        function getMyName() { return myRole === 'party1' ? 'الوالد' : 'الابن'; }
-        function getOtherName() { return myRole === 'party1' ? 'الابن' : 'الوالد'; }
-
-        function init() {
-            updateRoleUI();
-            connectSignaling();
-            pollPairStatus();
-            setInterval(pollPairStatus, 3000);
+        function updateStatus(text, type = 'idle') {
+            statusText.textContent = text;
+            statusDot.className = 'status-dot';
+            if (type === 'connected') statusDot.classList.add('connected');
+            if (type === 'calling') statusDot.classList.add('calling');
         }
 
-        function switchRole(role) {
-            if (callState !== 'idle') return;
-            myRole = role;
-            localStorage.setItem('p2p_party_role', role);
-            updateRoleUI();
-            registerPresence();
-            pollPairStatus();
+        function showError(msg) {
+            errorArea.innerHTML = `<div class="error-msg">${msg}</div>`;
+            setTimeout(() => { errorArea.innerHTML = ''; }, 6000);
         }
 
-        function updateRoleUI() {
-            if (myRole === 'party1') {
-                btnRole1.classList.add('active');
-                btnRole2.classList.remove('active');
-            } else {
-                btnRole2.classList.add('active');
-                btnRole1.classList.remove('active');
-            }
-        }
-
-        function openOtherPartyInNewWindow() {
-            const other = getOtherId();
-            const url = `${window.location.origin}${window.location.pathname}?role=${other}`;
-            window.open(url, '_blank');
-        }
-
-        // ======================================================================
-        // REAL PRESENCE & HONEST PAIR STATUS CHECK
-        // ======================================================================
-        let sse = null;
-
-        function connectSignaling() {
-            registerPresence();
-            setupSSE();
-            setInterval(registerPresence, 8000);
-        }
-
-        async function registerPresence() {
-            try {
-                await fetch('/api/signal/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: getMyId(),
-                        name: getMyName(),
-                        status: callState === 'idle' ? 'available' : 'busy'
-                    })
-                });
-            } catch (_) {}
-
-            if (broadcast) {
-                try {
-                    broadcast.postMessage({
-                        type: 'presence_pulse',
-                        from: getMyId(),
-                        name: getMyName(),
-                        timestamp: Date.now()
-                    });
-                } catch (_) {}
-            }
-        }
-
-        async function pollPairStatus() {
-            try {
-                const res = await fetch('/api/signal/pair_status');
-                if (res.ok) {
-                    const data = await res.json();
-                    updateHandshakeUI(data);
-                }
-            } catch (_) {}
-        }
-
-        function updateHandshakeUI(data) {
-            const p1 = data.party1 || {};
-            const p2 = data.party2 || {};
-
-            // Update P1 indicator
-            if (p1.online) {
-                dotParty1.className = 'dot online';
-                textParty1.textContent = 'متصل 🟢';
-                textParty1.style.color = '#00ff88';
-            } else {
-                dotParty1.className = 'dot';
-                textParty1.textContent = 'غير متصل 🔴';
-                textParty1.style.color = '#ef4444';
-            }
-
-            // Update P2 indicator
-            if (p2.online) {
-                dotParty2.className = 'dot online';
-                textParty2.textContent = 'متصل 🟢';
-                textParty2.style.color = '#00ff88';
-            } else {
-                dotParty2.className = 'dot';
-                textParty2.textContent = 'غير متصل 🔴';
-                textParty2.style.color = '#ef4444';
-            }
-
-            otherPartyOnline = (myRole === 'party1') ? p2.online : p1.online;
-
-            if (callState === 'idle') {
-                if (data.both_online) {
-                    handshakeSummary.className = 'handshake-summary ready';
-                    handshakeSummaryText.textContent = `المصادقة متطابقة ✅ الطرفان متصلان على نفس الخط وجاهزان للمكالمة.`;
-
-                    callBtn.className = 'call-btn start';
-                    callBtn.disabled = false;
-                    callBtnLabel.textContent = `اتصال بـ ${getOtherName()}`;
-                    callBtnSub.textContent = `اضغط هنا ليبدأ هاتف ${getOtherName()} بالرنين فوراً.`;
-                } else {
-                    handshakeSummary.className = 'handshake-summary waiting';
-                    handshakeSummaryText.textContent = `بانتظار أن يفتح ${getOtherName()} الصفحة على جهازه أولاً...`;
-
-                    callBtn.className = 'call-btn disabled';
-                    callBtn.disabled = true;
-                    callBtnLabel.textContent = `بانتظار ${getOtherName()}`;
-                    callBtnSub.textContent = `الطرف الآخر غير متواجد حالياً. افتح الرابط على جهازه لتكتمل المصادقة.`;
-                }
-            }
-        }
-
-        function setupSSE() {
-            if (sse) {
-                try { sse.close(); } catch (_) {}
-            }
-            try {
-                sse = new EventSource(`/api/signal/events?peer_id=${encodeURIComponent(getMyId())}&name=${encodeURIComponent(getMyName())}`);
-                sse.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        onSignalReceived(data);
-                    } catch (_) {}
-                };
-                sse.onerror = () => {
-                    setTimeout(setupSSE, 4000);
-                };
-            } catch (_) {}
-        }
-
-        async function sendSignal(type, payload = {}) {
-            const msg = {
-                from: getMyId(),
-                from_name: getMyName(),
-                to: getOtherId(),
-                type: type,
-                payload: payload,
-                timestamp: Date.now()
-            };
-
-            if (broadcast) {
-                try { broadcast.postMessage(msg); } catch (_) {}
-            }
-
-            try {
-                await fetch('/api/signal/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(msg)
-                });
-            } catch (_) {}
-        }
-
-        // ======================================================================
-        // GENUINE CALL FLOW & WEBRTC HANDSHAKE
-        // ======================================================================
-
+        // --- Microphone Access ---
         async function getAudio() {
-            if (localStream) return true;
+            if (localStream) return localStream;
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({
                     audio: {
@@ -693,87 +493,245 @@
                     },
                     video: false
                 });
-                return true;
+                return localStream;
             } catch (err) {
-                alert('يرجى السماح بالوصول للميكروفون لبدء المكالمة: ' + err.message);
-                return false;
+                showError('❌ يرجى السماح بالوصول للميكروفون: ' + err.message);
+                return null;
             }
         }
 
-        function handleCallButtonClick() {
-            if (callState === 'idle') {
-                if (!otherPartyOnline) {
-                    alert(`الطرف الآخر (${getOtherName()}) غير متصل حالياً! افتح الصفحة على جهازه أولاً.`);
+        // Complete ICE Gathering Helper
+        function waitForIceComplete(peerConn) {
+            return new Promise((resolve) => {
+                if (peerConn.iceGatheringState === 'complete') {
+                    resolve();
                     return;
                 }
-                startCall();
-            } else if (callState === 'calling') {
-                cancelCall();
-            } else if (callState === 'connected') {
-                hangup();
+                let timer = null;
+                const check = () => {
+                    if (peerConn.iceGatheringState === 'complete') {
+                        cleanup();
+                        resolve();
+                    }
+                };
+                const onCandidate = (e) => {
+                    if (!e.candidate) {
+                        cleanup();
+                        resolve();
+                    }
+                };
+                const cleanup = () => {
+                    if (timer) clearTimeout(timer);
+                    peerConn.removeEventListener('icecandidate', onCandidate);
+                    peerConn.removeEventListener('icegatheringstatechange', check);
+                };
+                peerConn.addEventListener('icecandidate', onCandidate);
+                peerConn.addEventListener('icegatheringstatechange', check);
+                timer = setTimeout(() => {
+                    cleanup();
+                    resolve();
+                }, 1200);
+            });
+        }
+
+        // --- Call Button (Toggle Call / Hangup) ---
+        async function toggleCall() {
+            if (callMode === 'idle') {
+                await startCall();
+            } else {
+                await hangup();
             }
         }
 
-        // 1. Caller starts call -> sends call_start signal
+        // 1. Initiate Call
         async function startCall() {
-            if (!await getAudio()) return;
+            const stream = await getAudio();
+            if (!stream) return;
 
-            callState = 'calling';
+            callMode = 'calling';
+            updateStatus('🟡 جاري الاتصال...', 'calling');
+
             callBtn.className = 'call-btn calling';
             callBtn.textContent = '📞';
-            callBtnLabel.textContent = `جاري الاتصال بـ ${getOtherName()}...`;
-            callBtnSub.textContent = 'اضغط هنا لإلغاء الاتصال';
+            callCaption.textContent = 'جاري الرنين...';
+            callSubtext.textContent = 'اضغط لإلغاء الاتصال';
 
             playRingbackTone();
-            sendSignal('call_start', { caller: getMyName() });
-        }
 
-        function cancelCall() {
-            stopRingtone();
-            sendSignal('call_cancel');
-            resetCall();
-        }
+            if (pc) {
+                try { pc.close(); } catch (_) {}
+            }
+            pc = new RTCPeerConnection(rtcConfig);
 
-        // 2. Callee receives call_start -> starts ringing
-        function onIncomingCall(callerName) {
-            if (callState !== 'idle') {
-                sendSignal('call_busy');
-                return;
+            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+            pc.ontrack = handleOnTrack;
+            pc.onconnectionstatechange = handleConnectionStateChange;
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            await waitForIceComplete(pc);
+
+            const completeOffer = {
+                type: pc.localDescription.type,
+                sdp: pc.localDescription.sdp
+            };
+
+            try {
+                await fetch('/api/signal/p2p_call', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        caller: myDeviceId,
+                        offer: completeOffer
+                    })
+                });
+            } catch (err) {
+                showError('فشل إرسال إشارة الاتصال: ' + err.message);
             }
 
-            callState = 'ringing';
-            incomingTitleText.textContent = `🔔 اتصال وارد من ${callerName || getOtherName()}...`;
-            incomingCallBox.classList.add('active');
+            if (broadcast) {
+                broadcast.postMessage({ type: 'p2p_call', caller: myDeviceId, offer: completeOffer });
+            }
+        }
 
+        // 2. Incoming Call Trigger
+        function onIncomingCall(offer, callerId) {
+            if (callMode !== 'idle' || pc || callerId === myDeviceId) return;
+            pendingIncomingOffer = offer;
+            callMode = 'ringing';
+
+            incomingCard.classList.remove('hidden');
+            updateStatus('🔔 اتصال وارد...', 'calling');
             playIncomingRingtone();
         }
 
-        // 3. Callee accepts -> sends call_accept
+        // 3. Answer Incoming Call
         async function answerCall() {
             stopRingtone();
-            incomingCallBox.classList.remove('active');
+            incomingCard.classList.add('hidden');
 
-            if (!await getAudio()) {
+            const stream = await getAudio();
+            if (!stream) {
                 rejectCall();
                 return;
             }
 
-            callState = 'connected';
-            sendSignal('call_accept');
-            setupWebRTC(false); // Callee setup
+            callMode = 'connecting';
+            updateStatus('🟡 جاري الربط...', 'calling');
+
+            if (pc) {
+                try { pc.close(); } catch (_) {}
+            }
+            pc = new RTCPeerConnection(rtcConfig);
+
+            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+            pc.ontrack = handleOnTrack;
+            pc.onconnectionstatechange = handleConnectionStateChange;
+
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(pendingIncomingOffer));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+
+                await waitForIceComplete(pc);
+
+                const completeAnswer = {
+                    type: pc.localDescription.type,
+                    sdp: pc.localDescription.sdp
+                };
+
+                await fetch('/api/signal/p2p_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answer: completeAnswer })
+                });
+
+                if (broadcast) {
+                    broadcast.postMessage({ type: 'p2p_answer', answer: completeAnswer });
+                }
+
+                setConnectedUI();
+            } catch (err) {
+                showError('فشل الرد على المكالمة: ' + err.message);
+                resetCall();
+            }
+        }
+
+        // 4. Reject Incoming Call
+        async function rejectCall() {
+            stopRingtone();
+            incomingCard.classList.add('hidden');
+            await hangup();
+        }
+
+        // 5. Caller receives Answer
+        async function onAnswerReceived(answer) {
+            if (pc && pc.signalingState === 'have-local-offer') {
+                stopRingtone();
+                try {
+                    await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                    setConnectedUI();
+                } catch (err) {
+                    showError('خطأ استقبال الرد: ' + err.message);
+                }
+            }
+        }
+
+        // 6. Connected State
+        function setConnectedUI() {
+            callMode = 'connected';
+            callActive = true;
+            stopRingtone();
+
+            incomingCard.classList.add('hidden');
+            updateStatus('✅ متصل! جاري الاستماع...', 'connected');
+
+            callBtn.className = 'call-btn end';
+            callBtn.textContent = '🔴';
+            callCaption.textContent = 'إنهاء المكالمة';
+            callSubtext.textContent = 'المكالمة متصلة الآن بصوت حقيقي مباشر';
+
+            callTimer.classList.remove('hidden');
+            startTimer();
+            startVisualizer();
+        }
+
+        function handleOnTrack(e) {
+            remoteAudio.srcObject = e.streams[0];
+            remoteAudio.play().catch(() => {});
             setConnectedUI();
         }
 
-        function rejectCall() {
-            stopRingtone();
-            incomingCallBox.classList.remove('active');
-            sendSignal('call_reject');
-            resetCall();
+        function handleConnectionStateChange() {
+            if (!pc) return;
+            if (pc.connectionState === 'connected') {
+                setConnectedUI();
+            } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                resetCall();
+            }
         }
 
-        function hangup() {
-            sendSignal('call_end');
+        // 7. Hangup Call
+        async function hangup() {
+            if (isResetting) return;
+            isResetting = true;
+            try {
+                await fetch('/api/signal/p2p_hangup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: '{}'
+                });
+            } catch (_) {}
+
+            if (broadcast) {
+                broadcast.postMessage({ type: 'p2p_hangup' });
+            }
+
             resetCall();
+            setTimeout(() => { isResetting = false; }, 800);
         }
 
         function resetCall() {
@@ -792,140 +750,87 @@
             }
 
             remoteAudio.srcObject = null;
-            callState = 'idle';
+            callActive = false;
+            callMode = 'idle';
+            pendingIncomingOffer = null;
 
-            incomingCallBox.classList.remove('active');
-            callDuration.classList.add('hidden');
+            incomingCard.classList.add('hidden');
+            callTimer.classList.add('hidden');
 
-            pollPairStatus();
-            registerPresence();
+            callBtn.className = 'call-btn start';
+            callBtn.textContent = '📞';
+            callCaption.textContent = 'اضغط للاتصال';
+            callSubtext.textContent = 'يرن هاتف الجهاز الآخر فوراً بنقرة واحدة';
+            updateStatus('جاهز للاتصال', 'idle');
         }
 
-        function setConnectedUI() {
-            callState = 'connected';
-            callBtn.className = 'call-btn end';
-            callBtn.textContent = '🔴';
-            callBtnLabel.textContent = 'إنهاء المكالمة';
-            callBtnSub.textContent = 'المكالمة متصلة الآن بصوت حقيقي مباشر P2P';
-
-            callDuration.classList.remove('hidden');
-            startTimer();
-            startVisualizer();
+        // --- Call Timer ---
+        function startTimer() {
+            stopTimer();
+            callDurationSeconds = 0;
+            callTimer.textContent = '00:00';
+            callTimerInterval = setInterval(() => {
+                callDurationSeconds++;
+                const mins = String(Math.floor(callDurationSeconds / 60)).padStart(2, '0');
+                const secs = String(callDurationSeconds % 60).padStart(2, '0');
+                callTimer.textContent = `${mins}:${secs}`;
+            }, 1000);
         }
 
-        // ======================================================================
-        // WEBRTC PEER CONNECTION & REAL OFFER / ANSWER HANDSHAKE
-        // ======================================================================
-        async function setupWebRTC(isCaller) {
-            if (pc) {
-                try { pc.close(); } catch (_) {}
+        function stopTimer() {
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
             }
+        }
 
-            pc = new RTCPeerConnection(rtcConfig);
+        // --- Audio Visualizer ---
+        function startVisualizer() {
+            stopVisualizer();
+            if (!localStream) return;
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                const vCtx = new AC();
+                const source = vCtx.createMediaStreamSource(localStream);
+                const analyser = vCtx.createAnalyser();
+                analyser.fftSize = 64;
+                source.connect(analyser);
 
-            if (localStream) {
-                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-            }
-
-            pc.ontrack = (e) => {
-                remoteAudio.srcObject = e.streams[0];
-                remoteAudio.play().catch(() => {});
-            };
-
-            pc.onicecandidate = (e) => {
-                if (e.candidate) {
-                    sendSignal('ice', e.candidate);
+                const container = document.getElementById('audioIndicator');
+                container.innerHTML = '';
+                for (let i = 0; i < 12; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = '4px';
+                    container.appendChild(bar);
                 }
-            };
 
-            pc.onconnectionstatechange = () => {
-                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-                    resetCall();
-                }
-            };
+                const bars = container.querySelectorAll('.bar');
+                const data = new Uint8Array(analyser.frequencyBinCount);
 
-            // Caller generates genuine Offer
-            if (isCaller) {
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer);
-                sendSignal('offer', offer);
-            }
+                const render = () => {
+                    if (callMode !== 'connected') return;
+                    analyser.getByteFrequencyData(data);
+                    bars.forEach((bar, idx) => {
+                        const val = data[idx * 2] || 0;
+                        const h = Math.max(4, (val / 255) * 32);
+                        bar.style.height = `${h}px`;
+                    });
+                    visualizerAnim = requestAnimationFrame(render);
+                };
+                render();
+            } catch (_) {}
         }
 
-        // ======================================================================
-        // CENTRAL SIGNAL RECEIVER
-        // ======================================================================
-        async function onSignalReceived(msg) {
-            if (!msg || msg.from === getMyId() || msg.to !== getMyId()) {
-                // If it's a presence broadcast from other party
-                if (msg && msg.type === 'presence_pulse' && msg.from === getOtherId()) {
-                    pollPairStatus();
-                }
-                return;
+        function stopVisualizer() {
+            if (visualizerAnim) {
+                cancelAnimationFrame(visualizerAnim);
+                visualizerAnim = null;
             }
-
-            switch (msg.type) {
-                case 'call_start':
-                    onIncomingCall(msg.from_name);
-                    break;
-
-                case 'call_accept':
-                    stopRingtone();
-                    setConnectedUI();
-                    setupWebRTC(true); // Caller generates real Offer upon acceptance
-                    break;
-
-                case 'call_reject':
-                    stopRingtone();
-                    alert(`رفض ${getOtherName()} المكالمة`);
-                    resetCall();
-                    break;
-
-                case 'call_cancel':
-                    stopRingtone();
-                    incomingCallBox.classList.remove('active');
-                    resetCall();
-                    break;
-
-                case 'call_end':
-                    resetCall();
-                    break;
-
-                case 'call_busy':
-                    stopRingtone();
-                    alert(`${getOtherName()} مشغول في مكالمة حالياً`);
-                    resetCall();
-                    break;
-
-                case 'offer':
-                    if (callState === 'connected') {
-                        if (!pc) await setupWebRTC(false);
-                        await pc.setRemoteDescription(new RTCSessionDescription(msg.payload));
-                        const answer = await pc.createAnswer();
-                        await pc.setLocalDescription(answer);
-                        sendSignal('answer', answer);
-                    }
-                    break;
-
-                case 'answer':
-                    if (pc && msg.payload) {
-                        await pc.setRemoteDescription(new RTCSessionDescription(msg.payload));
-                    }
-                    break;
-
-                case 'ice':
-                    if (pc && msg.payload) {
-                        try {
-                            await pc.addIceCandidate(new RTCIceCandidate(msg.payload));
-                        } catch (_) {}
-                    }
-                    break;
-            }
+            document.getElementById('audioIndicator').innerHTML = '';
         }
 
-        // ======================================================================
-        // SOUND GENERATOR (RINGTONES VIA WEB AUDIO API)
-        // ======================================================================
+        // --- Sound Generator (Pure Web Audio Synthetic Ringtones) ---
         function getAudioContext() {
             const AC = window.AudioContext || window.webkitAudioContext;
             if (!audioCtx && AC) audioCtx = new AC();
@@ -946,7 +851,7 @@
                         const gain = ctx.createGain();
                         osc.frequency.setValueAtTime(440, t + dt);
                         gain.gain.setValueAtTime(0.001, t + dt);
-                        gain.gain.linearRampToValueAtTime(0.25, t + dt + 0.02);
+                        gain.gain.linearRampToValueAtTime(0.3, t + dt + 0.02);
                         gain.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.18);
                         osc.connect(gain);
                         gain.connect(ctx.destination);
@@ -957,7 +862,7 @@
             };
 
             ring();
-            ringInterval = setInterval(ring, 2200);
+            ringTimer = setInterval(ring, 1800);
         }
 
         function playRingbackTone() {
@@ -972,91 +877,81 @@
                     const gain = ctx.createGain();
                     osc.frequency.setValueAtTime(425, t);
                     gain.gain.setValueAtTime(0.001, t);
-                    gain.gain.linearRampToValueAtTime(0.12, t + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+                    gain.gain.linearRampToValueAtTime(0.15, t + 0.05);
+                    gain.gain.setValueAtTime(0.15, t + 0.95);
+                    gain.gain.linearRampToValueAtTime(0.001, t + 1.0);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.start(t);
-                    osc.stop(t + 1.2);
+                    osc.stop(t + 1.0);
                 } catch (_) {}
             };
 
             ring();
-            ringInterval = setInterval(ring, 3200);
+            ringTimer = setInterval(ring, 3000);
         }
 
         function stopRingtone() {
-            if (ringInterval) {
-                clearInterval(ringInterval);
-                ringInterval = null;
+            if (ringTimer) {
+                clearInterval(ringTimer);
+                ringTimer = null;
             }
         }
 
-        // ======================================================================
-        // TIMER & AUDIO VISUALIZER
-        // ======================================================================
-        function startTimer() {
-            stopTimer();
-            callSeconds = 0;
-            updateTimerDisplay();
-            callTimerInterval = setInterval(() => {
-                callSeconds++;
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function stopTimer() {
-            if (callTimerInterval) {
-                clearInterval(callTimerInterval);
-                callTimerInterval = null;
+        // --- Cross-Tab BroadcastChannel Handler ---
+        function onBroadcastMessage(msg) {
+            if (!msg) return;
+            if (msg.type === 'p2p_call' && msg.caller !== myDeviceId) {
+                onIncomingCall(msg.offer, msg.caller);
+            } else if (msg.type === 'p2p_answer' && callMode === 'calling') {
+                onAnswerReceived(msg.answer);
+            } else if (msg.type === 'p2p_hangup') {
+                resetCall();
             }
         }
 
-        function updateTimerDisplay() {
-            const m = Math.floor(callSeconds / 60);
-            const s = callSeconds % 60;
-            callDuration.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        }
-
-        function startVisualizer() {
-            stopVisualizer();
-            const ctx = getAudioContext();
-            if (!ctx) return;
-
-            const stream = remoteAudio.srcObject || localStream;
-            if (!stream) return;
-
+        // --- HTTP Session Synchronizer (Runs every 500ms) ---
+        async function syncSession() {
             try {
-                const src = ctx.createMediaStreamSource(stream);
-                analyser = ctx.createAnalyser();
-                analyser.fftSize = 32;
-                src.connect(analyser);
+                const res = await fetch(`/api/signal/p2p_session?device_id=${encodeURIComponent(myDeviceId)}`);
+                if (!res.ok) return;
+                const data = await res.json();
 
-                const bars = document.querySelectorAll('.bar');
-                const data = new Uint8Array(analyser.frequencyBinCount);
-
-                function loop() {
-                    if (callState !== 'connected') return;
-                    analyser.getByteFrequencyData(data);
-                    bars.forEach((b, i) => {
-                        const h = Math.max(6, Math.min(30, (data[i] / 255) * 30));
-                        b.style.height = h + 'px';
-                    });
-                    animFrame = requestAnimationFrame(loop);
+                // Status of other device
+                if (data.otherOnline) {
+                    otherStatusBadge.textContent = 'الجهاز الآخر متصل 🟢';
+                    otherStatusBadge.style.color = '#00ff88';
+                } else {
+                    otherStatusBadge.textContent = 'بانتظار فتح الجهاز الآخر ⚪';
+                    otherStatusBadge.style.color = '#94a3b8';
                 }
-                loop();
+
+                // Check for incoming call
+                if (data.callState === 'calling' && data.caller !== myDeviceId && data.offer) {
+                    if (callMode === 'idle' && !pc) {
+                        onIncomingCall(data.offer, data.caller);
+                    }
+                }
+
+                // Check for answer on caller side
+                if (data.callState === 'connected' && data.caller === myDeviceId && data.answer) {
+                    if (callMode === 'calling' && pc && pc.signalingState === 'have-local-offer') {
+                        onAnswerReceived(data.answer);
+                    }
+                }
+
+                // Check for hangup
+                if (data.callState === 'idle' && (callActive || callMode === 'calling' || callMode === 'ringing')) {
+                    if (!isResetting) {
+                        resetCall();
+                    }
+                }
             } catch (_) {}
         }
 
-        function stopVisualizer() {
-            if (animFrame) {
-                cancelAnimationFrame(animFrame);
-                animFrame = null;
-            }
-            document.querySelectorAll('.bar').forEach(b => b.style.height = '6px');
-        }
-
-        window.addEventListener('DOMContentLoaded', init);
+        // Initialize
+        syncSession();
+        setInterval(syncSession, 500);
     </script>
 </body>
 </html>
