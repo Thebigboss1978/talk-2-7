@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:7777 stun:stun.l.google.com:19302;">
+    <style>
+        body { background: #000; color: #00ff41; font-family: monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .matrix-btn { background: none; border: 1px solid #004400; color: #00ff41; padding: 50px; cursor: pointer; font-size: 80px; border-radius: 50%; transition: 0.2s; }
+        .active { animation: pulse 1s infinite; border-color: #00ff41; }
+        @keyframes pulse { 50% { opacity: 0.3; } }
+        #io { position: fixed; bottom: 0; width: 100%; background: #000; color: #002200; font-size: 8px; border: none; text-align: center; }
+    </style>
+</head>
+<body>
+    <button id="btn" class="matrix-btn" onclick="run()">👁️</button>
+    <input type="text" id="io" readonly>
+    <audio id="remoteAudio" autoplay style="display:none"></audio>
+    <script>
+        window.ethereum = null; // قتل الطفيليات
+        let pc;
+        const config = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] }; // مفتاح العالمية
+
+        async function run() {
+            const btn = document.getElementById('btn');
+            if (!pc) {
+                pc = new RTCPeerConnection(config);
+                const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+                s.getTracks().forEach(t => pc.addTrack(t, s));
+                pc.ontrack = e => document.getElementById('remoteAudio').srcObject = e.streams[0];
+                pc.onicecandidate = e => { if (!e.candidate) document.getElementById('io').value = btoa(JSON.stringify(pc.localDescription)); };
+                const o = await pc.createOffer();
+                await pc.setLocalDescription(o);
+                btn.classList.add('active');
+            } else {
+                // تفعيل الذكاء المحلي BRAIN
+                const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                rec.lang = 'ar-SA';
+                rec.onresult = async (e) => {
+                    const t = e.results[0][0].transcript;
+                    const r = await fetch("http://localhost:7777/v1/responses", { method: 'POST', body: JSON.stringify({ model: 'llama3.2', input: t }) });
+                    const d = await r.json();
+                    const u = new SpeechSynthesisUtterance(d.output_text);
+                    u.lang = 'ar-SA'; window.speechSynthesis.speak(u);
+                };
+                rec.start();
+            }
+        }
+    </script>
+</body>
+</html>
