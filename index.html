@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlArab 777 | P2P Call</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#10141b;color:#eee;font:15px Arial,sans-serif}
+main{max-width:520px;margin:auto}
+h2{font-size:21px}
+button,textarea{width:100%;margin:6px 0;padding:12px;border-radius:8px}
+button{border:0;background:#c9a64b;color:#111;font-weight:bold;font-size:15px;cursor:pointer}
+button:disabled{opacity:.5}
+textarea{background:#090c10;color:#ddd;border:1px solid #444;min-height:100px;resize:vertical}
+#status{padding:12px;background:#202631;border-radius:8px;overflow-wrap:anywhere}
+audio{width:100%;margin:10px 0}
+.small{color:#aaa;font-size:13px;line-height:1.5}
+</style>
+</head>
+<body>
+<main>
+<h2>AlArab Club 777 — P2P Call</h2>
+<p id="status">Ready. Use both devices to connect.</p>
+
+<button id="offerBtn">✆ 1. Create Offer (Device A)</button>
+<label for="offerBox">Offer — copy to Device B</label>
+<textarea id="offerBox" placeholder="Offer appears here. On Device B, paste the received Offer here."></textarea>
+
+<button id="answerBtn">✆ 2. Create Answer (Device B)</button>
+<label for="answerBox">Answer — copy back to Device A</label>
+<textarea id="answerBox" placeholder="On Device A, paste the received Answer here."></textarea>
+
+<button id="connectBtn">✆ 3. Apply Answer (Device A)</button>
+<button id="hangupBtn" style="background:#333;color:#fff">End Call</button>
+
+<audio id="remoteAudio" autoplay controls playsinline></audio>
+<p class="small">Allow microphone access when prompted. Keep this page open on both devices. Exchange Offer and Answer using copy and paste.</p>
+</main>
+
+<script>
+"use strict";
+
+const config = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" }
+  ]
+};
+
+let pc = null;
+let localStream = null;
+let remoteStream = null;
+
+const $ = id => document.getElementById(id);
+const status = message => $("status").textContent = message;
+
+function readSDP(id) {
+  const raw = $(id).value.trim();
+  if (!raw) throw new Error("Paste the connection data first.");
+  const data = JSON.parse(raw);
+  if (!data.type || !data.sdp) {
+    throw new Error("Invalid Offer/Answer data.");
+  }
+  return data;
+}
+
+async function getMicrophone() {
+  if (!navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia) {
+    throw new Error("Microphone requires HTTPS or localhost.");
+  }
+
+  if (!localStream) {
+    localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false
+    });
+  }
+
+  return localStream;
+}
+
+async function createPeer() {
+  if (pc) return pc;
+
+  pc = new RTCPeerConnection(config);
+  remoteStream = new MediaStream();
+  $("remoteAudio").srcObject = remoteStream;
+
+  pc.ontrack = event => {
+    if (event.streams && event.streams[0]) {
+      event.streams[0].getTracks().forEach(track => {
+        if (!remoteStream.getTracks().some(t => t.id === track.id)) {
+          remoteStream.addTrack(track);
+        }
+      });
+    } else if (!remoteStream.getTracks().some(t => t.id === event.track.id)) {
+      remoteStream.addTrack(event.track);
+    }
+
+    $("remoteAudio").play().catch(() => {
+      status("Remote audio ready. Press Play on the audio player.");
+    });
+  };
+
+  pc.onconnectionstatechange = () => {
+    if (!pc) return;
+    const state = pc.connectionState;
+    status("Connection: " + state);
+    if (state === "connected") {
+      status("Connected. Speak into your microphone.");
+    }
+    if (state === "failed") {
+      status("Connection failed. This network may require a TURN server.");
+    }
+  };
+
+  pc.oniceconnectionstatechange = () => {
+    if (pc && pc.iceConnectionState === "disconnected") {
+      status("Connection interrupted. Waiting for recovery...");
+    }
+  };
+
+  return pc;
+}
+
+async function waitForICE(connection) {
+  if (connection.iceGatheringState === "complete") return;
+
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("ICE gathering timed out. Try again."));
+    }, 25000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      connection.removeEventListener(
+        "icegatheringstatechange", check
+      );
+    }
+
+    function check() {
+      if (connection.iceGatheringState === "complete") {
+        cleanup();
+        resolve();
+      }
+    }
+
+    connection.addEventListener("icegatheringstatechange", check);
+    check();
+  });
+}
+
+async function createOffer() {
+  try {
+    $("offerBtn").disabled = true;
+    status("Requesting microphone permission...");
+    const stream = await getMicrophone();
+    const connection = await createPeer();
+
+    stream.getAudioTracks().forEach(track => {
+      if (!connection.getSenders().some(s => s.track === track)) {
+        connection.addTrack(track, stream);
+      }
+    });
+
+    status("Creating Offer...");
+    const offer = await connection.createOffer();
+    await connection.setLocalDescription(offer);
+    status("Preparing connection data...");
+    await waitForICE(connection);
+
+    $("offerBox").value = JSON.stringify(connection.localDescription);
+    status("Offer ready. Copy it to Device B.");
+  } catch (error) {
+    status(error.message || "Could not create Offer.");
+  } finally {
+    $("offerBtn").disabled = false;
+  }
+}
+
+async function createAnswer() {
+  try {
+    $("answerBtn").disabled = true;
+    const offer = readSDP("offerBox");
+
+    if (offer.type !== "offer") {
+      throw new Error("Device B needs an Offer in the first box.");
+    }
+
+    status("Requesting microphone permission...");
+    const stream = await getMicrophone();
+    const connection = await createPeer();
+
+    stream.getAudioTracks().forEach(track => {
+      if (!connection.getSenders().some(s => s.track === track)) {
+        connection.addTrack(track, stream);
+      }
+    });
+
+    await connection.setRemoteDescription(offer);
+    status("Creating Answer...");
+    const answer = await connection.createAnswer();
+    await connection.setLocalDescription(answer);
+    status("Preparing connection data...");
+    await waitForICE(connection);
+
+    $("answerBox").value = JSON.stringify(connection.localDescription);
+    status("Answer ready. Copy it back to Device A.");
+  } catch (error) {
+    status(error.message || "Could not create Answer.");
+  } finally {
+    $("answerBtn").disabled = false;
+  }
+}
+
+async function applyAnswer() {
+  try {
+    const answer = readSDP("answerBox");
+
+    if (answer.type !== "answer") {
+      throw new Error("Paste the Answer from Device B into the second box.");
+    }
+
+    if (!pc || !pc.localDescription ||
+        pc.localDescription.type !== "offer") {
+      throw new Error("Create the Offer on Device A first.");
+    }
+
+    await pc.setRemoteDescription(answer);
+    status("Answer applied. Connecting devices...");
+  } catch (error) {
+    status(error.message || "Could not apply Answer.");
+  }
+}
+
+function hangUp() {
+  if (pc) {
+    pc.ontrack = null;
+    pc.onconnectionstatechange = null;
+    pc.oniceconnectionstatechange = null;
+    pc.close();
+    pc = null;
+  }
+
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+  }
+
+  remoteStream = null;
+  $("remoteAudio").srcObject = null;
+  status("Call ended.");
+}
+
+$("offerBtn").addEventListener("click", createOffer);
+$("answerBtn").addEventListener("click", createAnswer);
+$("connectBtn").addEventListener("click", applyAnswer);
+$("hangupBtn").addEventListener("click", hangUp);
+
+window.addEventListener("pagehide", hangUp);
+</script>
+</body>
+</html>
