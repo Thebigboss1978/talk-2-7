@@ -1,265 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AlArab 777 | P2P Call</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlArab 777 P2P Call</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;background:#10141b;color:#eee;font:15px Arial,sans-serif}
-main{max-width:520px;margin:auto}
-h2{font-size:21px}
-button,textarea{width:100%;margin:6px 0;padding:12px;border-radius:8px}
-button{border:0;background:#c9a64b;color:#111;font-weight:bold;font-size:15px;cursor:pointer}
+body{margin:0;padding:20px;background:#10141b;color:#eee;font:16px Arial,sans-serif}
+main{max-width:440px;margin:auto}
+button{width:100%;padding:14px;margin:6px 0;border:0;border-radius:8px;background:#d5b45b;color:#111;font-weight:bold;font-size:16px}
 button:disabled{opacity:.5}
-textarea{background:#090c10;color:#ddd;border:1px solid #444;min-height:100px;resize:vertical}
-#status{padding:12px;background:#202631;border-radius:8px;overflow-wrap:anywhere}
-audio{width:100%;margin:10px 0}
-.small{color:#aaa;font-size:13px;line-height:1.5}
+#status{padding:12px;background:#222a35;border-radius:8px;overflow-wrap:anywhere}
+#qr{margin:14px auto;width:200px;min-height:0;background:white;text-align:center}
+#qr img,#qr canvas{max-width:100%;height:auto}
+audio{width:100%;margin:12px 0}
+small{color:#aaa;line-height:1.5}
 </style>
 </head>
 <body>
 <main>
-<h2>AlArab Club 777 — P2P Call</h2>
-<p id="status">Ready. Use both devices to connect.</p>
+<h3>AlArab 777 — Voice Call</h3>
+<div id="status">Ready</div>
 
-<button id="offerBtn">✆ 1. Create Offer (Device A)</button>
-<label for="offerBox">Offer — copy to Device B</label>
-<textarea id="offerBox" placeholder="Offer appears here. On Device B, paste the received Offer here."></textarea>
+<button id="create">✆ Create Room + QR</button>
+<div id="qr"></div>
+<button id="join">✆ Join Room</button>
+<button id="end" style="background:#333;color:white">End Call</button>
 
-<button id="answerBtn">✆ 2. Create Answer (Device B)</button>
-<label for="answerBox">Answer — copy back to Device A</label>
-<textarea id="answerBox" placeholder="On Device A, paste the received Answer here."></textarea>
-
-<button id="connectBtn">✆ 3. Apply Answer (Device A)</button>
-<button id="hangupBtn" style="background:#333;color:#fff">End Call</button>
-
-<audio id="remoteAudio" autoplay controls playsinline></audio>
-<p class="small">Allow microphone access when prompted. Keep this page open on both devices. Exchange Offer and Answer using copy and paste.</p>
+<audio id="audio" autoplay playsinline controls></audio>
+<p><small>Create a room on device A. Scan its QR with device B and press Join Room. Allow microphone access on both devices.</small></p>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 "use strict";
 
-const config = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" }
-  ]
+const $ = id => document.getElementById(id);
+const state = {
+  peer: null,
+  stream: null,
+  call: null,
+  room: new URL(location.href).searchParams.get("room"),
+  qr: null
 };
 
-let pc = null;
-let localStream = null;
-let remoteStream = null;
-
-const $ = id => document.getElementById(id);
-const status = message => $("status").textContent = message;
-
-function readSDP(id) {
-  const raw = $(id).value.trim();
-  if (!raw) throw new Error("Paste the connection data first.");
-  const data = JSON.parse(raw);
-  if (!data.type || !data.sdp) {
-    throw new Error("Invalid Offer/Answer data.");
-  }
-  return data;
+function status(text) {
+  $("status").textContent = text;
 }
 
-async function getMicrophone() {
-  if (!navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia) {
-    throw new Error("Microphone requires HTTPS or localhost.");
+async function microphone() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw Error("Microphone requires HTTPS.");
   }
-
-  if (!localStream) {
-    localStream = await navigator.mediaDevices.getUserMedia({
+  if (!state.stream) {
+    state.stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: false
     });
   }
-
-  return localStream;
+  return state.stream;
 }
 
-async function createPeer() {
-  if (pc) return pc;
+function newPeer() {
+  if (typeof Peer === "undefined") {
+    throw Error("PeerJS failed to load. Check your internet connection.");
+  }
 
-  pc = new RTCPeerConnection(config);
-  remoteStream = new MediaStream();
-  $("remoteAudio").srcObject = remoteStream;
-
-  pc.ontrack = event => {
-    if (event.streams && event.streams[0]) {
-      event.streams[0].getTracks().forEach(track => {
-        if (!remoteStream.getTracks().some(t => t.id === track.id)) {
-          remoteStream.addTrack(track);
-        }
-      });
-    } else if (!remoteStream.getTracks().some(t => t.id === event.track.id)) {
-      remoteStream.addTrack(event.track);
-    }
-
-    $("remoteAudio").play().catch(() => {
-      status("Remote audio ready. Press Play on the audio player.");
+  return new Promise((resolve, reject) => {
+    const peer = new Peer(undefined, {
+      host: "0.peerjs.com",
+      port: 443,
+      path: "/",
+      secure: true
     });
-  };
 
-  pc.onconnectionstatechange = () => {
-    if (!pc) return;
-    const state = pc.connectionState;
-    status("Connection: " + state);
-    if (state === "connected") {
-      status("Connected. Speak into your microphone.");
-    }
-    if (state === "failed") {
-      status("Connection failed. This network may require a TURN server.");
-    }
-  };
+    peer.once("open", id => {
+      state.peer = peer;
+      resolve({ peer, id });
+    });
 
-  pc.oniceconnectionstatechange = () => {
-    if (pc && pc.iceConnectionState === "disconnected") {
-      status("Connection interrupted. Waiting for recovery...");
-    }
-  };
-
-  return pc;
-}
-
-async function waitForICE(connection) {
-  if (connection.iceGatheringState === "complete") return;
-
-  await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error("ICE gathering timed out. Try again."));
-    }, 25000);
-
-    function cleanup() {
-      clearTimeout(timeout);
-      connection.removeEventListener(
-        "icegatheringstatechange", check
-      );
-    }
-
-    function check() {
-      if (connection.iceGatheringState === "complete") {
-        cleanup();
-        resolve();
-      }
-    }
-
-    connection.addEventListener("icegatheringstatechange", check);
-    check();
+    peer.once("error", error => {
+      reject(error);
+    });
   });
 }
 
-async function createOffer() {
-  try {
-    $("offerBtn").disabled = true;
-    status("Requesting microphone permission...");
-    const stream = await getMicrophone();
-    const connection = await createPeer();
+function receive(call) {
+  if (state.call) {
+    call.close();
+    return;
+  }
 
-    stream.getAudioTracks().forEach(track => {
-      if (!connection.getSenders().some(s => s.track === track)) {
-        connection.addTrack(track, stream);
-      }
+  if (!confirm("Accept incoming voice call?")) {
+    call.close();
+    return;
+  }
+
+  state.call = call;
+  call.answer(state.stream);
+  attachCall(call);
+}
+
+function attachCall(call) {
+  call.on("stream", stream => {
+    $("audio").srcObject = stream;
+    $("audio").play().catch(() => {
+      status("Connected. Press Play to hear audio.");
+    });
+    status("Connected — voice call active.");
+  });
+
+  call.on("close", () => {
+    $("audio").srcObject = null;
+    if (state.call === call) state.call = null;
+    status("Call ended.");
+  });
+
+  call.on("error", error => {
+    status("Call error: " + error.message);
+  });
+}
+
+async function createRoom() {
+  $("create").disabled = true;
+
+  try {
+    status("Allow microphone access...");
+    await microphone();
+
+    const { peer, id } = await newPeer();
+    peer.on("call", receive);
+
+    const url = new URL(location.href);
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("room", id);
+
+    $("qr").replaceChildren();
+    new QRCode($("qr"), {
+      text: url.href,
+      width: 200,
+      height: 200
     });
 
-    status("Creating Offer...");
-    const offer = await connection.createOffer();
-    await connection.setLocalDescription(offer);
-    status("Preparing connection data...");
-    await waitForICE(connection);
-
-    $("offerBox").value = JSON.stringify(connection.localDescription);
-    status("Offer ready. Copy it to Device B.");
+    state.room = id;
+    status("Room ready. Scan QR on device B.");
   } catch (error) {
-    status(error.message || "Could not create Offer.");
+    status(error.message || "Could not create room.");
   } finally {
-    $("offerBtn").disabled = false;
+    $("create").disabled = false;
   }
 }
 
-async function createAnswer() {
+async function joinRoom() {
+  $("join").disabled = true;
+
   try {
-    $("answerBtn").disabled = true;
-    const offer = readSDP("offerBox");
+    const room = state.room ||
+      new URL(location.href).searchParams.get("room");
 
-    if (offer.type !== "offer") {
-      throw new Error("Device B needs an Offer in the first box.");
-    }
+    if (!room) throw Error("Scan the room QR code first.");
 
-    status("Requesting microphone permission...");
-    const stream = await getMicrophone();
-    const connection = await createPeer();
+    status("Allow microphone access...");
+    await microphone();
 
-    stream.getAudioTracks().forEach(track => {
-      if (!connection.getSenders().some(s => s.track === track)) {
-        connection.addTrack(track, stream);
-      }
-    });
+    const { peer } = await newPeer();
 
-    await connection.setRemoteDescription(offer);
-    status("Creating Answer...");
-    const answer = await connection.createAnswer();
-    await connection.setLocalDescription(answer);
-    status("Preparing connection data...");
-    await waitForICE(connection);
+    status("Connecting to room...");
+    const call = peer.call(room, state.stream);
 
-    $("answerBox").value = JSON.stringify(connection.localDescription);
-    status("Answer ready. Copy it back to Device A.");
+    if (!call) throw Error("Could not start call.");
+
+    state.call = call;
+    attachCall(call);
   } catch (error) {
-    status(error.message || "Could not create Answer.");
+    status(error.message || "Could not join room.");
   } finally {
-    $("answerBtn").disabled = false;
+    $("join").disabled = false;
   }
 }
 
-async function applyAnswer() {
-  try {
-    const answer = readSDP("answerBox");
-
-    if (answer.type !== "answer") {
-      throw new Error("Paste the Answer from Device B into the second box.");
-    }
-
-    if (!pc || !pc.localDescription ||
-        pc.localDescription.type !== "offer") {
-      throw new Error("Create the Offer on Device A first.");
-    }
-
-    await pc.setRemoteDescription(answer);
-    status("Answer applied. Connecting devices...");
-  } catch (error) {
-    status(error.message || "Could not apply Answer.");
-  }
-}
-
-function hangUp() {
-  if (pc) {
-    pc.ontrack = null;
-    pc.onconnectionstatechange = null;
-    pc.oniceconnectionstatechange = null;
-    pc.close();
-    pc = null;
+function endCall() {
+  if (state.call) {
+    state.call.close();
+    state.call = null;
   }
 
-  if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-    localStream = null;
+  if (state.peer) {
+    state.peer.destroy();
+    state.peer = null;
   }
 
-  remoteStream = null;
-  $("remoteAudio").srcObject = null;
+  if (state.stream) {
+    state.stream.getTracks().forEach(track => track.stop());
+    state.stream = null;
+  }
+
+  $("audio").srcObject = null;
+  $("qr").replaceChildren();
   status("Call ended.");
 }
 
-$("offerBtn").addEventListener("click", createOffer);
-$("answerBtn").addEventListener("click", createAnswer);
-$("connectBtn").addEventListener("click", applyAnswer);
-$("hangupBtn").addEventListener("click", hangUp);
+$("create").addEventListener("click", createRoom);
+$("join").addEventListener("click", joinRoom);
+$("end").addEventListener("click", endCall);
 
-window.addEventListener("pagehide", hangUp);
+if (state.room) {
+  status("Room link detected. Press Join Room.");
+  $("join").style.outline = "2px solid #d5b45b";
+}
 </script>
 </body>
 </html>
