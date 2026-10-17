@@ -16,10 +16,7 @@ G0.079/ctrl7+xi
 
 ## 4 Core Operational Commands (أوامر التشغيل الأساسية)
 
-1. **تشغيل النواة والمحرك الأساسي (LocalAI):**
-   ```bash
-   localai-cli run --config ~/.localai/launcher.json
-
+1. **تشغيل النواة والمحرك الأساسي 
 ```
 
 2. **تشغيل بوابة العمليات الخلفية (FastAPI Gateway):**
@@ -36,7 +33,7 @@ python -m mlx_audio.server --host 0.0.0.0 --port 5001
 ```
 
 
-4. **تشغيل واجهة التفاعل والمراقبة (Pipecat / UI):**
+4. **تشغيل واجهة التفاعل والمراقبة (seVen/UI):**
 ```bash
 npm run dev -- --port 3700
 
