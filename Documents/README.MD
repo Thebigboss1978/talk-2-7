@@ -1,8 +1,6 @@
 www.workartgroup.com
 
-G0.079/ctrl7+xi
-
-فهمت القصد يا عرّاب تماماً. سنقوم بهيكلة وتوثيق المشروع على خطى مستودعات `github` ولكن بتركيز تقني بحت وخالٍ من الحشو، بحيث يتم اختصار عمليات التشغيل في **اقل عدد أوامر أساسية** فقط، وجعل المرجعية متصلة ومحدثة مباشرة عبر الرابط `[https://raw.githubusercontent.com/Thebigboss1978/talk27/refs/heads/main/Documents/README.MD](https://raw.githubusercontent.com/Thebigboss1978/talk27/refs/heads/main/Documents/README.MD)`.
+هيكلة وتوثيق المشروع على خطى مستودعات `github` ولكن بتركيز تقني بحت وخالٍ من الحشو، بحيث يتم اختصار عمليات التشغيل في **اقل عدد أوامر أساسية** فقط، وجعل المرجعية متصلة ومحدثة مباشرة عبر الرابط `[https://raw.githubusercontent.com/Thebigboss1978/talk27/refs/heads/main/Documents/README.MD](https://raw.githubusercontent.com/Thebigboss1978/talk27/refs/heads/main/Documents/README.MD)`.
 
 إليك الهيكلية التقنية المباشرة التي يتم تخزينها وتحديثها للتشغيل الفوري:
 
