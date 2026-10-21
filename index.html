@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>اتصال P2P صوتي مباشر — خط صوت مشفر بين طرفين</title>
+    <title>اتصال P2P مباشر — خط صوت ونصوص وملفات مشفر بين طرفين</title>
     <style>
         * {
             margin: 0;
@@ -14,7 +14,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at 50% 20%, #162447 0%, #0f172a 60%, #080d1a 100%);
+            background: radial-gradient(circle at 50% 15%, #131d36 0%, #0b1120 55%, #050811 100%);
             min-height: 100vh;
             color: #f1f5f9;
             padding: 16px;
@@ -25,21 +25,21 @@
 
         .container {
             width: 100%;
-            max-width: 620px;
+            max-width: 640px;
             margin: 0 auto;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .header h1 {
-            font-size: 1.85em;
+            font-size: 1.8em;
             font-weight: 800;
             color: #00f2fe;
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,8 +48,8 @@
 
         .header p {
             color: #94a3b8;
-            font-size: 0.95em;
-            line-height: 1.5;
+            font-size: 0.9em;
+            line-height: 1.4;
         }
 
         /* Status Bar */
@@ -57,8 +57,8 @@
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 12px 18px;
-            margin-bottom: 14px;
+            padding: 10px 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -97,13 +97,13 @@
         }
 
         .status-text {
-            font-size: 0.92em;
+            font-size: 0.9em;
             font-weight: 600;
             color: #e2e8f0;
         }
 
         .network-badge {
-            font-size: 0.78em;
+            font-size: 0.75em;
             padding: 3px 8px;
             border-radius: 6px;
             background: rgba(56, 189, 248, 0.15);
@@ -117,8 +117,8 @@
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(0, 242, 254, 0.35);
             border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 14px;
+            margin-bottom: 14px;
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
@@ -127,7 +127,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .wave-label-group {
@@ -140,20 +140,20 @@
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
             color: #00f2fe;
             border: 1px solid rgba(0, 242, 254, 0.5);
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: 6px;
             font-family: 'Courier New', Courier, monospace;
             font-weight: 700;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         .wave-new-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #cbd5e1;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 8px;
-            font-size: 0.82em;
+            font-size: 0.8em;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -166,85 +166,82 @@
         .wave-link-box {
             display: flex;
             gap: 8px;
-            align-items: center;
             margin-bottom: 8px;
         }
 
         .wave-input {
             flex: 1;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #10b981;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.88em;
-            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #38bdf8;
+            padding: 9px 12px;
             border-radius: 8px;
-            direction: ltr;
-            text-align: left;
+            font-size: 0.85em;
+            font-family: monospace;
             outline: none;
+            direction: ltr;
         }
 
         .wave-copy-btn {
             background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            color: #041226;
-            font-weight: 700;
+            color: #051026;
             border: none;
-            padding: 10px 16px;
+            padding: 0 16px;
             border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.85em;
             cursor: pointer;
+            transition: opacity 0.2s;
             white-space: nowrap;
-            font-size: 0.88em;
-            transition: all 0.2s;
         }
 
         .wave-copy-btn:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
+            opacity: 0.9;
         }
 
         .wave-hint {
-            font-size: 0.8em;
+            font-size: 0.78em;
             color: #94a3b8;
             line-height: 1.4;
         }
 
         /* Incoming Call Alert */
         .incoming-call-bay {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2));
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 14px;
             display: none;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
-            border: 1px solid #10b981;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 16px;
             text-align: center;
-            animation: ring-pulse 1.2s infinite alternate;
+            animation: ring-pulse 1.5s infinite;
         }
 
         @keyframes ring-pulse {
-            from { box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
-            to { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7); }
+            0%, 100% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
         }
 
         .incoming-title {
-            font-size: 1.1em;
+            font-size: 0.95em;
             font-weight: 700;
-            color: #34d399;
-            margin-bottom: 12px;
+            color: #fbbf24;
+            margin-bottom: 10px;
         }
 
         .incoming-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
         }
 
         .incoming-btn {
-            padding: 10px 22px;
+            padding: 8px 18px;
             border-radius: 8px;
+            border: none;
             font-weight: 700;
             cursor: pointer;
-            border: none;
-            font-size: 0.95em;
+            font-size: 0.88em;
             transition: all 0.2s;
         }
 
@@ -258,45 +255,50 @@
             color: #fff;
         }
 
-        /* Call Controls Panel */
+        /* Call Bay */
         .call-bay {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 24px 16px;
-            text-align: center;
-            margin-bottom: 16px;
+            border-radius: 14px;
+            padding: 18px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(12px);
         }
 
         .call-trigger-btn {
-            width: 110px;
-            height: 110px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             border: none;
-            font-size: 2.8em;
+            outline: none;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
+            display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 2.1em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
         .call-trigger-btn.idle {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
         }
 
         .call-trigger-btn.idle:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.7);
+            transform: scale(1.06);
+            box-shadow: 0 0 32px rgba(16, 185, 129, 0.7);
         }
 
         .call-trigger-btn.busy {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: #fff;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
-            animation: busy-shake 1.5s infinite;
+            box-shadow: 0 0 24px rgba(239, 68, 68, 0.5);
+            animation: busy-shake 2.5s infinite;
         }
 
         @keyframes busy-shake {
@@ -305,8 +307,8 @@
         }
 
         .call-hint-text {
-            margin-top: 14px;
-            font-size: 0.9em;
+            margin-top: 10px;
+            font-size: 0.88em;
             color: #cbd5e1;
             font-weight: 500;
         }
@@ -317,8 +319,8 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            margin-top: 16px;
-            height: 28px;
+            margin-top: 12px;
+            height: 24px;
         }
 
         .bar {
@@ -329,174 +331,159 @@
             transition: height 0.08s ease;
         }
 
-        /* Hardware Gates Matrix */
-        .gates-accordion {
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .gates-header {
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.03);
-            font-size: 0.9em;
-            color: #cbd5e1;
-        }
-
-        .gates-header:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .gates-content {
-            display: none;
+        /* Shared Clipboard Box (DataChannel P2P Text Box) */
+        .shared-box-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 14px;
             padding: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 14px;
+            backdrop-filter: blur(10px);
         }
 
-        .gate-row {
+        .box-title-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 8px 10px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            margin-bottom: 6px;
-            font-size: 0.85em;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
-        .gate-title {
+        .box-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #34d399;
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: #e2e8f0;
+            gap: 6px;
         }
 
-        .gate-status-pill {
-            padding: 2px 8px;
+        .box-channel-status {
+            font-size: 0.72em;
+            padding: 2px 7px;
             border-radius: 5px;
-            font-size: 0.78em;
-            font-weight: 700;
+            background: rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
             font-family: monospace;
         }
 
-        .gate-status-pill.online {
+        .box-channel-status.active {
             background: rgba(16, 185, 129, 0.2);
             color: #10b981;
             border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
-        .gate-status-pill.offline {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-        }
-
-        /* Manual Fallback Accordion */
-        .manual-section {
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .manual-toggle-btn {
+        .shared-textarea {
             width: 100%;
-            background: transparent;
-            border: none;
-            padding: 12px 16px;
-            text-align: right;
-            color: #94a3b8;
+            height: 85px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 8px;
             font-size: 0.88em;
-            cursor: pointer;
+            line-height: 1.4;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .shared-textarea:focus {
+            border-color: #34d399;
+        }
+
+        .box-actions-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 8px;
+            gap: 8px;
         }
 
-        .manual-toggle-btn:hover {
+        .box-btn {
+            background: rgba(255, 255, 255, 0.1);
             color: #e2e8f0;
-        }
-
-        .manual-body {
-            display: none;
-            padding: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .manual-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        @media (max-width: 520px) {
-            .manual-grid { grid-template-columns: 1fr; }
-        }
-
-        .manual-panel {
-            background: rgba(0, 0, 0, 0.35);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .manual-panel h4 {
-            font-size: 0.85em;
-            margin-bottom: 6px;
-            color: #cbd5e1;
-        }
-
-        .code-area {
-            width: 100%;
-            height: 70px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #38bdf8;
-            font-family: monospace;
-            font-size: 0.75em;
-            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 12px;
             border-radius: 6px;
-            resize: none;
-            direction: ltr;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 6px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.78em;
+            font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
             transition: all 0.2s;
         }
 
-        .action-btn:hover {
+        .box-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
 
-        .action-btn.primary {
-            background: #3b82f6;
-        }
-
-        .action-btn.success {
+        .box-btn.primary {
             background: #10b981;
             color: #041226;
+            border: none;
+        }
+
+        .box-btn.primary:hover {
+            background: #059669;
+            color: #fff;
+        }
+
+        /* File Transfer Bay */
+        .file-transfer-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .file-dropzone {
+            border: 2px dashed rgba(56, 189, 248, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.5);
+            transition: all 0.2s;
+        }
+
+        .file-dropzone:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .file-drop-text {
+            font-size: 0.82em;
+            color: #94a3b8;
+        }
+
+        .file-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .file-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #38bdf8;
+            transition: width 0.1s;
+        }
+
+        .incoming-file-alert {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82em;
         }
 
         /* Toast & Error */
@@ -508,9 +495,9 @@
             background: #1e293b;
             color: #38bdf8;
             border: 1px solid #38bdf8;
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 8px;
-            font-size: 0.88em;
+            font-size: 0.85em;
             z-index: 100;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             display: none;
@@ -522,7 +509,7 @@
         <!-- Header -->
         <div class="header">
             <h1>📞 اتصال P2P مباشر</h1>
-            <p>خط صوتي فوري مشفر بين طرفين عبر الألياف الضوئية — اتصال من الحديدة إلى الحديدة</p>
+            <p>صوت + صندوق نصوص ونسخ/لصق + نقل ملفات مباشر محلياً (Zero Data / LAN)</p>
         </div>
 
         <!-- Status Bar -->
@@ -531,7 +518,7 @@
                 <div class="status-dot" id="statusDot"></div>
                 <span class="status-text" id="statusText">جاهز للاتصال</span>
             </div>
-            <span class="network-badge" id="signalingMode">STUN: Google Mesh</span>
+            <span class="network-badge" id="signalingMode">P2P: جاهز</span>
         </div>
 
         <!-- Dynamic Wave Card -->
@@ -539,7 +526,7 @@
             <div class="wave-top-row">
                 <div class="wave-label-group">
                     <span style="font-size: 1.1em;">📡</span>
-                    <strong style="color: #f8fafc; font-size: 0.9em;">موجة الغرفة:</strong>
+                    <strong style="color: #f8fafc; font-size: 0.88em;">موجة الغرفة:</strong>
                     <span class="wave-id-badge" id="waveTag">جاري التوليد...</span>
                 </div>
                 <button class="wave-new-btn" onclick="generateNewWave()">🔄 موجة جديدة</button>
@@ -549,13 +536,13 @@
                 <button class="wave-copy-btn" id="copyWaveBtn" onclick="copyWaveLink()">📋 نسخ الرابط</button>
             </div>
             <p class="wave-hint">
-                💡 افتح هذا الرابط على الجهاز الآخر؛ يلتقي الجهازان على نفس الموجة تلقائياً ويمكن فتح خط الصوت بضغطة زر واحدة.
+                💡 افتح الرابط على الجهاز الآخر ليدخل معك في نفس الموجة تلقائياً.
             </p>
         </div>
 
         <!-- Incoming Call Modal -->
         <div class="incoming-call-bay" id="incomingCallBay">
-            <div class="incoming-title">🔔 مكالمة واردة على هذه الموجة من الطرف الآخر!</div>
+            <div class="incoming-title">🔔 مكالمة صوتية واردة على هذه الموجة!</div>
             <div class="incoming-actions">
                 <button class="incoming-btn incoming-accept" onclick="acceptIncomingCall()">🟢 قبول والتحدث</button>
                 <button class="incoming-btn incoming-reject" onclick="rejectIncomingCall()">🔴 رفض</button>
@@ -569,65 +556,43 @@
             <div class="audio-bars" id="audioMeter"></div>
         </div>
 
-        <!-- Hardware Gates Matrix (Truth-Bound Real Ping) -->
-        <div class="gates-accordion">
-            <div class="gates-header" onclick="toggleAccordion('gatesContent', 'gatesArrow')">
-                <span>🖥️ حالة المحركات والنماذج المحلية (Apple Silicon Metal)</span>
-                <span id="gatesArrow">▼</span>
+        <!-- Shared Clipboard Box (Direct P2P DataChannel Text) -->
+        <div class="shared-box-card">
+            <div class="box-title-row">
+                <div class="box-title">
+                    <span>📋</span>
+                    <span>الصندوق المشترك (نسخ / لصق متزامن)</span>
+                </div>
+                <span class="box-channel-status" id="dataChannelBadge">القناة: غير متصل</span>
             </div>
-            <div class="gates-content" id="gatesContent">
-                <div class="gate-row">
-                    <div class="gate-title">
-                        <span>🧠</span>
-                        <span>العقل واللغة (MLX-LM · Gemma / Llama)</span>
-                    </div>
-                    <span class="gate-status-pill offline" id="gate7777Status">127.0.0.1:7777 (فحص...)</span>
-                </div>
-                <div class="gate-row">
-                    <div class="gate-title">
-                        <span>🎙️</span>
-                        <span>اللسان والصوت (MLX-Audio · Kokoro / Qwen3-TTS)</span>
-                    </div>
-                    <span class="gate-status-pill offline" id="gate5001Status">127.0.0.1:5001 (فحص...)</span>
-                </div>
-                <div class="gate-row">
-                    <div class="gate-title">
-                        <span>⚡</span>
-                        <span>بوابة التحكم والطرفية (ttyd zsh)</span>
-                    </div>
-                    <span class="gate-status-pill offline" id="gate7682Status">127.0.0.1:7682 (فحص...)</span>
-                </div>
-                <div style="margin-top: 10px; font-size: 0.8em; color: #94a3b8; line-height: 1.4;">
-                    * يتم الفحص المباشر عبر اتصالات حقيقية (Zero-Mocking Protocol). إذا كانت مغلقة، يظهر OFFLINE دون تزييف.
+            <textarea class="shared-textarea" id="sharedText" placeholder="اكتب أو الصق أي نص هنا... سيظهر تلقائياً في شاشة الطرف الثاني فوراً عبر القناة المباشرة"></textarea>
+            <div class="box-actions-row">
+                <span style="font-size: 0.75em; color: #94a3b8;" id="sharedBoxNote">المزامنة فورية وتعمل عبر الشبكة الداخلية بدون استهلاك إنترنت</span>
+                <div style="display: flex; gap: 6px;">
+                    <button class="box-btn" onclick="copySharedText()">📋 نسخ النص</button>
+                    <button class="box-btn primary" onclick="sendSharedTextNow()">🚀 إرسال تحديث</button>
                 </div>
             </div>
         </div>
 
-        <!-- Manual Backup Handshake Panel -->
-        <div class="manual-section">
-            <button class="manual-toggle-btn" onclick="toggleAccordion('manualBody', 'manualArrow')">
-                <span>🛠️ لوحة التبادل اليدوي (في حال انقطاع خادم الإشارة)</span>
-                <span id="manualArrow">▼</span>
-            </button>
-            <div class="manual-body" id="manualBody">
-                <div class="manual-grid">
-                    <div class="manual-panel">
-                        <h4>📤 كود العرض (Offer)</h4>
-                        <textarea class="code-area" id="offerBox" placeholder="يظهر هنا كود العرض عند الاتصال..."></textarea>
-                        <div class="action-row">
-                            <button class="action-btn" onclick="copyOffer()">نسخ</button>
-                            <button class="action-btn primary" onclick="generateOffer()">توليد Offer</button>
-                        </div>
-                    </div>
-                    <div class="manual-panel">
-                        <h4>📥 كود الرد (Answer)</h4>
-                        <textarea class="code-area" id="answerBox" placeholder="الصق كود الرد من الجهاز الآخر..."></textarea>
-                        <div class="action-row">
-                            <button class="action-btn" onclick="pasteAnswer()">لصق</button>
-                            <button class="action-btn success" onclick="connectWithAnswer()">تثبيت الرد</button>
-                        </div>
-                    </div>
+        <!-- File Transfer Card (Direct P2P File Sending) -->
+        <div class="file-transfer-card">
+            <div class="box-title-row">
+                <div class="box-title" style="color: #38bdf8;">
+                    <span>📁</span>
+                    <span>تبادل الملفات المباشر (P2P File Transfer)</span>
                 </div>
+            </div>
+            <div class="file-dropzone" onclick="document.getElementById('fileInput').click()">
+                <div class="file-drop-text" id="dropText">اضغط لاختيار ملف وإرساله مباشرة إلى الجهاز الآخر</div>
+                <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelected(event)">
+            </div>
+            <div class="file-progress-bar" id="fileProgressBar">
+                <div class="file-progress-fill" id="fileProgressFill"></div>
+            </div>
+            <div class="incoming-file-alert" id="incomingFileAlert">
+                <span id="incomingFileName">وصلك ملف: ...</span>
+                <a id="downloadFileBtn" class="box-btn primary" href="#" download="" style="text-decoration: none;">⬇️ تنزيل الملف</a>
             </div>
         </div>
     </div>
@@ -638,23 +603,21 @@
     <audio id="remoteAudio" autoplay playsinline></audio>
 
     <script>
-        // --- 1. STUN Configuration with Google + Global Redundant Relays ---
+        // --- 1. STUN & Peer Configuration ---
         const ICE_SERVERS_CONFIG = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' },
-                // Global fallbacks if Google STUN is unreachable
                 { urls: 'stun:stun.cloudflare.com:3478' },
-                { urls: 'stun:openrelay.metered.ca:80' },
-                { urls: 'stun:stun.freeswitch.org:3478' }
+                { urls: 'stun:openrelay.metered.ca:80' }
             ],
             iceCandidatePoolSize: 10
         };
 
         let pc = null;
+        let dataChannel = null;
+        let fileChannel = null;
         let localStream = null;
         let isConnected = false;
         let isInitiator = false;
@@ -665,7 +628,13 @@
         let animFrameId = null;
         let eventSource = null;
 
-        // Unique device ID for this browser tab
+        // File receiving state
+        let incomingFileData = [];
+        let incomingFileSize = 0;
+        let incomingFileNameStr = '';
+        let receivedBytes = 0;
+
+        // Unique device ID for this tab
         const myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
 
         // Elements
@@ -676,11 +645,16 @@
         const waveTag = document.getElementById('waveTag');
         const waveLinkInput = document.getElementById('waveLinkInput');
         const incomingCallBay = document.getElementById('incomingCallBay');
-        const offerBox = document.getElementById('offerBox');
-        const answerBox = document.getElementById('answerBox');
         const remoteAudio = document.getElementById('remoteAudio');
         const toastMsg = document.getElementById('toastMsg');
         const signalingModeBadge = document.getElementById('signalingMode');
+        const sharedTextEl = document.getElementById('sharedText');
+        const dataChannelBadge = document.getElementById('dataChannelBadge');
+        const fileProgressBar = document.getElementById('fileProgressBar');
+        const fileProgressFill = document.getElementById('fileProgressFill');
+        const incomingFileAlert = document.getElementById('incomingFileAlert');
+        const incomingFileName = document.getElementById('incomingFileName');
+        const downloadFileBtn = document.getElementById('downloadFileBtn');
 
         // --- 2. Wave & Domain Initialization ---
         function initWave() {
@@ -688,7 +662,7 @@
             let waveParam = urlParams.get('wave') || urlParams.get('room');
             
             if (!waveParam) {
-                // Generate a clean 6-char wave hash
+                // Generate a random clean wave hash
                 waveParam = 'w-' + Math.random().toString(36).substring(2, 8);
                 const newUrl = window.location.pathname + '?wave=' + waveParam;
                 window.history.replaceState({ wave: waveParam }, '', newUrl);
@@ -698,11 +672,13 @@
             waveTag.textContent = currentWave;
             waveLinkInput.value = window.location.href;
 
-            // Start Hybrid Signaling (Local Node + Public Server-Sent Events Mesh)
+            // Start Hybrid Signaling
             startHybridSignaling();
 
-            // Ping Hardware Gates
-            checkHardwareGates();
+            // Set up real-time typing sync for shared box
+            sharedTextEl.addEventListener('input', () => {
+                sendSharedTextNow();
+            });
         }
 
         function generateNewWave() {
@@ -713,13 +689,13 @@
         function showToast(msg) {
             toastMsg.textContent = msg;
             toastMsg.style.display = 'block';
-            setTimeout(() => { toastMsg.style.display = 'none'; }, 3000);
+            setTimeout(() => { toastMsg.style.display = 'none'; }, 2600);
         }
 
         async function copyWaveLink() {
             try {
                 await navigator.clipboard.writeText(waveLinkInput.value);
-                showToast('✅ تم نسخ الرابط للمشاركة');
+                showToast('✅ تم نسخ الرابط');
             } catch {
                 waveLinkInput.select();
                 document.execCommand('copy');
@@ -748,7 +724,7 @@
             }
         }
 
-        // --- 3. Hybrid Signaling Architecture (Works on localhost, Node server, and custom domains like workartgroup.com) ---
+        // --- 3. Hybrid Signaling ---
         function startHybridSignaling() {
             // Channel A: Try Local Node Signaling Endpoint
             if (syncTimer) clearInterval(syncTimer);
@@ -761,7 +737,7 @@
                 eventSource = new EventSource('https://ntfy.sh/' + topic + '/sse');
                 
                 eventSource.onopen = () => {
-                    signalingModeBadge.textContent = 'Signaling: Mesh Active';
+                    signalingModeBadge.textContent = 'P2P: Mesh Active';
                 };
 
                 eventSource.onmessage = async (e) => {
@@ -802,7 +778,7 @@
                 }
             } catch (_) {}
 
-            // Send to Public SSE Mesh (so workartgroup.com works without Node backend)
+            // Send to Public SSE Mesh
             try {
                 const topic = 'seven_wave_' + currentWave.replace(/[^a-zA-Z0-9_-]/g, '');
                 await fetch('https://ntfy.sh/' + topic, {
@@ -823,7 +799,7 @@
                 if (data.callState === 'calling' && data.caller !== myDeviceId && data.offer && !isConnected) {
                     pendingOffer = data.offer;
                     incomingCallBay.style.display = 'block';
-                    updateUIState('calling', '🔔 مكالمة واردة على هذه الموجة!');
+                    updateUIState('calling', '🔔 مكالمة صوتية واردة!');
                 } else if (data.callState === 'idle' && incomingCallBay.style.display === 'block') {
                     incomingCallBay.style.display = 'none';
                     pendingOffer = null;
@@ -833,8 +809,7 @@
                 if (isInitiator && !isConnected && data.callState === 'connected' && data.answer && pc) {
                     if (pc.signalingState === 'have-local-offer') {
                         await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-                        answerBox.value = JSON.stringify(data.answer);
-                        updateUIState('connected', '✅ متصل مباشرة عبر الألياف الضوئية (P2P)');
+                        updateUIState('connected', '✅ متصل محلياً (P2P Connected)');
                     }
                 }
             } catch (_) {}
@@ -846,12 +821,11 @@
             if (signal.type === 'offer' && !isConnected) {
                 pendingOffer = signal.sdp;
                 incomingCallBay.style.display = 'block';
-                updateUIState('calling', '🔔 مكالمة واردة على هذه الموجة!');
+                updateUIState('calling', '🔔 مكالمة صوتية واردة!');
             } else if (signal.type === 'answer' && isInitiator && pc && !isConnected) {
                 if (pc.signalingState === 'have-local-offer') {
                     pc.setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(() => {
-                        answerBox.value = JSON.stringify(signal.sdp);
-                        updateUIState('connected', '✅ متصل مباشرة عبر الألياف الضوئية (P2P)');
+                        updateUIState('connected', '✅ متصل محلياً (P2P Connected)');
                     }).catch(err => console.error('Set remote err:', err));
                 }
             } else if (signal.type === 'hangup') {
@@ -859,7 +833,7 @@
             }
         }
 
-        // --- 4. WebRTC Engine Initialization ---
+        // --- 4. WebRTC Engine & Data Channels ---
         async function initPC() {
             if (pc) {
                 try { pc.close(); } catch (_) {}
@@ -868,22 +842,29 @@
 
             pc = new RTCPeerConnection(ICE_SERVERS_CONFIG);
 
+            // Handle incoming DataChannels (created by the caller)
+            pc.ondatachannel = (event) => {
+                const ch = event.channel;
+                if (ch.label === 'text-sync') {
+                    setupTextDataChannel(ch);
+                } else if (ch.label === 'file-transfer') {
+                    setupFileDataChannel(ch);
+                }
+            };
+
             pc.ontrack = (event) => {
                 if (event.streams && event.streams[0]) {
                     remoteAudio.srcObject = event.streams[0];
-                    updateUIState('connected', '✅ متصل! خط الصوت مفتوح من الحديدة إلى الحديدة');
+                    updateUIState('connected', '✅ متصل! الصوت مفتوح عبر الشبكة المحلية');
                     startAudioMeter();
                 }
             };
 
             pc.onicecandidate = (event) => {
                 if (!event.candidate && pc.localDescription) {
-                    // All ICE candidates gathered
                     if (isInitiator) {
-                        offerBox.value = JSON.stringify(pc.localDescription);
                         broadcastSignal({ type: 'offer', sdp: pc.localDescription });
                     } else {
-                        answerBox.value = JSON.stringify(pc.localDescription);
                         broadcastSignal({ type: 'answer', sdp: pc.localDescription });
                     }
                 }
@@ -891,7 +872,7 @@
 
             pc.onconnectionstatechange = () => {
                 if (pc.connectionState === 'connected') {
-                    updateUIState('connected', '✅ متصل مباشرة (P2P Connected)');
+                    updateUIState('connected', '✅ متصل محلياً (P2P LAN)');
                 } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
                     updateUIState('idle', 'انقطع الاتصال');
                     resetCall(false);
@@ -899,6 +880,148 @@
             };
         }
 
+        function setupTextDataChannel(ch) {
+            dataChannel = ch;
+            dataChannel.onopen = () => {
+                dataChannelBadge.textContent = 'القناة: متصلة ونشطة ✅';
+                dataChannelBadge.className = 'box-channel-status active';
+                // Send current text if exists
+                if (sharedTextEl.value.trim()) {
+                    sendSharedTextNow();
+                }
+            };
+            dataChannel.onclose = () => {
+                dataChannelBadge.textContent = 'القناة: غير متصل';
+                dataChannelBadge.className = 'box-channel-status';
+            };
+            dataChannel.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === 'text_sync') {
+                        // Only update if text is different to prevent cursor jumps
+                        if (sharedTextEl.value !== msg.text) {
+                            sharedTextEl.value = msg.text;
+                        }
+                    }
+                } catch (_) {}
+            };
+        }
+
+        function setupFileDataChannel(ch) {
+            fileChannel = ch;
+            fileChannel.binaryType = 'arraybuffer';
+
+            fileChannel.onmessage = (event) => {
+                if (typeof event.data === 'string') {
+                    const meta = JSON.parse(event.data);
+                    if (meta.type === 'file_start') {
+                        incomingFileData = [];
+                        incomingFileSize = meta.size;
+                        incomingFileNameStr = meta.name;
+                        receivedBytes = 0;
+                        fileProgressBar.style.display = 'block';
+                        fileProgressFill.style.width = '0%';
+                        incomingFileAlert.style.display = 'none';
+                    } else if (meta.type === 'file_end') {
+                        fileProgressFill.style.width = '100%';
+                        setTimeout(() => { fileProgressBar.style.display = 'none'; }, 500);
+
+                        const blob = new Blob(incomingFileData);
+                        const url = URL.createObjectURL(blob);
+                        downloadFileBtn.href = url;
+                        downloadFileBtn.download = incomingFileNameStr;
+                        incomingFileName.textContent = `وصلك ملف (${(incomingFileSize / 1024).toFixed(1)} KB): ${incomingFileNameStr}`;
+                        incomingFileAlert.style.display = 'flex';
+                        showToast('📥 تم استلام الملف بنجاح!');
+                    }
+                } else {
+                    // Binary chunk
+                    incomingFileData.push(event.data);
+                    receivedBytes += event.data.byteLength;
+                    if (incomingFileSize > 0) {
+                        const pct = Math.min(100, (receivedBytes / incomingFileSize) * 100);
+                        fileProgressFill.style.width = pct + '%';
+                    }
+                }
+            };
+        }
+
+        // --- 5. Shared Clipboard Box Operations ---
+        function sendSharedTextNow() {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                const payload = JSON.stringify({
+                    type: 'text_sync',
+                    text: sharedTextEl.value
+                });
+                dataChannel.send(payload);
+            }
+        }
+
+        async function copySharedText() {
+            const val = sharedTextEl.value;
+            if (!val) return showToast('لا يوجد نص في الصندوق للنسخ');
+            try {
+                await navigator.clipboard.writeText(val);
+                showToast('✅ تم نسخ النص بنجاح');
+            } catch {
+                sharedTextEl.select();
+                document.execCommand('copy');
+                showToast('✅ تم نسخ النص');
+            }
+        }
+
+        // --- 6. Direct P2P File Sending ---
+        async function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!fileChannel || fileChannel.readyState !== 'open') {
+                showToast('⚠️ لا يوجد اتصال P2P نشط لنقل الملفات! اضغط زر الاتصال أولاً.');
+                return;
+            }
+
+            document.getElementById('dropText').textContent = `جاري إرسال: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`;
+            fileProgressBar.style.display = 'block';
+            fileProgressFill.style.width = '0%';
+
+            // Send metadata
+            fileChannel.send(JSON.stringify({
+                type: 'file_start',
+                name: file.name,
+                size: file.size
+            }));
+
+            const chunkSize = 16 * 1024; // 16KB chunk
+            let offset = 0;
+            const reader = new FileReader();
+
+            function readSlice() {
+                const slice = file.slice(offset, offset + chunkSize);
+                reader.readAsArrayBuffer(slice);
+            }
+
+            reader.onload = (e) => {
+                fileChannel.send(e.target.result);
+                offset += e.target.result.byteLength;
+                const pct = Math.min(100, (offset / file.size) * 100);
+                fileProgressFill.style.width = pct + '%';
+
+                if (offset < file.size) {
+                    readSlice();
+                } else {
+                    fileChannel.send(JSON.stringify({ type: 'file_end' }));
+                    showToast('✅ تم إرسال الملف بنجاح!');
+                    setTimeout(() => {
+                        fileProgressBar.style.display = 'none';
+                        document.getElementById('dropText').textContent = 'اضغط لاختيار ملف وإرساله مباشرة إلى الجهاز الآخر';
+                    }, 1200);
+                }
+            };
+
+            readSlice();
+        }
+
+        // --- 7. Call Triggers & Microphone ---
         async function requestMicrophone() {
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({
@@ -911,12 +1034,11 @@
                 });
                 return true;
             } catch (err) {
-                alert('يرجى السماح بالوصول إلى الميكروفون: ' + err.message);
+                alert('يرجى السماح بالوصول إلى الميكروفون للاتصال الصوتي: ' + err.message);
                 return false;
             }
         }
 
-        // --- 5. Call Triggers ---
         async function toggleCall() {
             if (isConnected) {
                 resetCall(true);
@@ -930,6 +1052,13 @@
 
             isInitiator = true;
             await initPC();
+
+            // Create Data Channels as initiator
+            const textCh = pc.createDataChannel('text-sync');
+            setupTextDataChannel(textCh);
+
+            const fCh = pc.createDataChannel('file-transfer');
+            setupFileDataChannel(fCh);
 
             localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
             updateUIState('calling', 'جاري إرسال إشارة الاتصال...');
@@ -975,6 +1104,16 @@
                 pc = null;
             }
 
+            if (dataChannel) {
+                try { dataChannel.close(); } catch (_) {}
+                dataChannel = null;
+            }
+
+            if (fileChannel) {
+                try { fileChannel.close(); } catch (_) {}
+                fileChannel = null;
+            }
+
             if (localStream) {
                 localStream.getTracks().forEach(t => t.stop());
                 localStream = null;
@@ -984,44 +1123,12 @@
             incomingCallBay.style.display = 'none';
             pendingOffer = null;
             isInitiator = false;
+            dataChannelBadge.textContent = 'القناة: غير متصل';
+            dataChannelBadge.className = 'box-channel-status';
             updateUIState('idle', 'جاهز للاتصال');
         }
 
-        // --- 6. Manual Offer / Answer Handshake ---
-        async function generateOffer() {
-            await startCall();
-        }
-
-        function copyOffer() {
-            if (!offerBox.value) return showToast('لا يوجد كود Offer للنسخ!');
-            offerBox.select();
-            document.execCommand('copy');
-            showToast('✅ تم نسخ كود Offer');
-        }
-
-        async function pasteAnswer() {
-            try {
-                answerBox.value = await navigator.clipboard.readText();
-                showToast('تم اللصق بنجاح');
-            } catch {
-                answerBox.focus();
-                showToast('الصق الكود يدوياً');
-            }
-        }
-
-        async function connectWithAnswer() {
-            const val = answerBox.value.trim();
-            if (!val) return showToast('يرجى لصق كود Answer أولاً');
-            try {
-                const sdp = JSON.parse(val);
-                await pc.setRemoteDescription(new RTCSessionDescription(sdp));
-                updateUIState('connected', '✅ تم ربط الرد - جاري فتح خط الصوت');
-            } catch (e) {
-                alert('كود Answer غير صالح: ' + e.message);
-            }
-        }
-
-        // --- 7. Live Audio Visualization ---
+        // --- 8. Audio Visualization ---
         function startAudioMeter() {
             if (!localStream) return;
             try {
@@ -1044,7 +1151,7 @@
                     const data = new Uint8Array(analyser.frequencyBinCount);
                     analyser.getByteFrequencyData(data);
                     for (let i = 0; i < bars.length; i++) {
-                        const h = Math.max(4, (data[i] / 255) * 28);
+                        const h = Math.max(4, (data[i] / 255) * 24);
                         bars[i].style.height = h + 'px';
                     }
                     if (isConnected) {
@@ -1059,45 +1166,6 @@
             if (animFrameId) cancelAnimationFrame(animFrameId);
             const meterEl = document.getElementById('audioMeter');
             if (meterEl) meterEl.innerHTML = '';
-        }
-
-        // --- 8. Sovereign Hardware Gates Checker (Zero Mocking Protocol) ---
-        async function checkHardwareGates() {
-            // Check Gate 7777 (MLX-LM Brain)
-            pingGate('http://127.0.0.1:7777/v1/models', 'gate7777Status');
-            // Check Gate 5001 (MLX-Audio Tongue)
-            pingGate('http://127.0.0.1:5001/v1/models', 'gate5001Status');
-            // Check Gate 7682 (ttyd Live Terminal)
-            pingGate('http://127.0.0.1:7682/', 'gate7682Status');
-        }
-
-        async function pingGate(url, elId) {
-            const el = document.getElementById(elId);
-            if (!el) return;
-            const start = performance.now();
-            try {
-                // Using no-cors to test reachability on local loopback without CORS failure
-                await fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
-                const dur = Math.round(performance.now() - start);
-                el.className = 'gate-status-pill online';
-                el.textContent = `ONLINE (${dur}ms)`;
-            } catch {
-                el.className = 'gate-status-pill offline';
-                el.textContent = 'OFFLINE (0ms)';
-            }
-        }
-
-        // UI Helpers
-        function toggleAccordion(bodyId, arrowId) {
-            const el = document.getElementById(bodyId);
-            const arrow = document.getElementById(arrowId);
-            if (el.style.display === 'block') {
-                el.style.display = 'none';
-                if (arrow) arrow.textContent = '▼';
-            } else {
-                el.style.display = 'block';
-                if (arrow) arrow.textContent = '▲';
-            }
         }
 
         window.addEventListener('DOMContentLoaded', initWave);
